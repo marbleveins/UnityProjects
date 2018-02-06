@@ -19,13 +19,14 @@ public struct OrientedPoint
         return position + rotation * point;
     }
 
+    public Vector3 LocalToWorldDirection(Vector3 dir)
+    {
+        return rotation * dir;
+    }
+
     public Vector3 WorldToLocal(Vector3 point)
     {
         return Quaternion.Inverse(rotation) * (point - position);
     }
 
-    public Vector3 LocalToWorldDirection(Vector3 dir)
-    {
-        return rotation * dir;
-    }
 }
