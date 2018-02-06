@@ -108,6 +108,7 @@ public class Curve : ScriptableObject
         return tangent.normalized;
     }
 
+    //Es necesario guardar una lista de CurveSample? no se es mejor tener las 2 listas por separado como el spline?
     private void ComputePoints()
     {
         samples.Clear();

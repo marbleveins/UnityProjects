@@ -2,8 +2,8 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(SplineExtrusion2))]
-public class SplineExtrusion2Editor : Editor
+[CustomEditor(typeof(Extruder))]
+public class ExtruderEditor : Editor
 {
     private const int QUAD_SIZE = 10;
     private Color CURVE_COLOR = new Color(0.8f, 0.8f, 0.8f);
@@ -11,11 +11,11 @@ public class SplineExtrusion2Editor : Editor
     private SerializedProperty textureScale;
     private SerializedProperty vertices;
 
-    private SplineExtrusion2 se;
-    private SplineExtrusion2.Vertex selection = null;
+    private Extruder se;
+    private Vertex selection = null;
 
     private void OnEnable() {
-        se = (SplineExtrusion2)target;
+        se = (Extruder)target;
         textureScale = serializedObject.FindProperty("TextureScale");
         vertices = serializedObject.FindProperty("ShapeVertices");
     }
@@ -38,7 +38,7 @@ public class SplineExtrusion2Editor : Editor
         Vector3 splineStart = se.spline.GetLocationAlongSpline(0);
         Quaternion q = CubicBezierCurve.GetRotationFromTangent(splineStartTangent);
 
-        foreach (SplineExtrusion2.Vertex v in se.ShapeVertices) {
+        foreach (Vertex v in se.ShapeVertices) {
             // we create point and normal relative to the spline start where the shape is drawn
             Vector3 point = se.transform.TransformPoint(q * v.point + splineStart);
             Vector3 normal = se.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
@@ -56,7 +56,7 @@ public class SplineExtrusion2Editor : Editor
                     if (mustCreateNewNode) {
                         // We must create a new node
                         mustCreateNewNode = false;
-                        SplineExtrusion2.Vertex newVertex = new SplineExtrusion2.Vertex(newVertexPoint, v.normal, v.uCoord);
+                        Vertex newVertex = new Vertex(newVertexPoint, v.normal, v.uCoord);
                         int i = se.ShapeVertices.IndexOf(v);
                         if(i == se.ShapeVertices.Count - 1) {
                             se.ShapeVertices.Add(newVertex);
@@ -69,7 +69,7 @@ public class SplineExtrusion2Editor : Editor
                         // normal must be updated if point has been moved
                         normal = se.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
                     }
-                    se.GenerateMesh();
+                    se.Generate();
                 } else {
                     // vertex position handle hasn't been moved
                     // create a handle for normal
@@ -77,7 +77,7 @@ public class SplineExtrusion2Editor : Editor
                     if(movedNormal != normal) {
                         // normal has been moved
                         v.normal = (Vector2)(Quaternion.Inverse(q) * (se.transform.InverseTransformPoint(movedNormal) - splineStart)) - v.point;
-                        se.GenerateMesh();
+                        se.Generate();
                     }
                 }
 
@@ -102,7 +102,7 @@ public class SplineExtrusion2Editor : Editor
             // draw a line between that vertex and the next one
             int index = se.ShapeVertices.IndexOf(v);
             int nextIndex = index == se.ShapeVertices.Count - 1 ? 0 : index + 1;
-            SplineExtrusion2.Vertex next = se.ShapeVertices[nextIndex];
+            Vertex next = se.ShapeVertices[nextIndex];
             Handles.color = CURVE_COLOR;
             Vector3 vAtSplineEnd = se.transform.TransformPoint(q * next.point + splineStart);
             Handles.DrawLine(point, vAtSplineEnd);
@@ -134,7 +134,7 @@ public class SplineExtrusion2Editor : Editor
             Undo.RegisterCompleteObjectUndo(se, "delete vertex");
             se.ShapeVertices.Remove(selection);
             selection = null;
-            se.GenerateMesh();
+            se.Generate();
         }
         GUI.enabled = true;
 
