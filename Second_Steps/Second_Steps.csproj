@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.3.0f3</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -285,7 +283,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Bezier\Bezier.cs" />
-    <Compile Include="Assets\SecondSteps\Assets\Scripts\Bezier\BezierControlPointMode.cs" />
+    <Compile Include="Assets\SecondSteps\Assets\Scripts\Bezier\ControlPointMode.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Common\OrientedPoint.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Common\Vertex.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Mesher\Extruder.cs" />
@@ -294,6 +292,7 @@
     <Compile Include="Assets\SecondSteps\Assets\Scripts\PathCreator.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\AguSpline.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\BezierSpline.cs" />
+    <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\ControlPoint.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\Curve.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\Node.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Bezier\CubicBezierCurve.cs" />

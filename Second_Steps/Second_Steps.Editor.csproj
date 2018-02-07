@@ -288,6 +288,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\AguSplineInspector.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\BezierSplineInspector.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\SplineExtrusion2Editor.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\SplineInspector.cs" />

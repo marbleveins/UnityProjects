@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BezierControlPointMode
+public enum ControlPointMode
 {
     Free,
     Aligned,

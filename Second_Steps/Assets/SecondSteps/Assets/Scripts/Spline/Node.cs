@@ -8,6 +8,7 @@ public class Node
     
     public Vector3 position;
     public Vector3 direction;
+    public ControlPointMode mode;
 
     public Node(Vector3 position, Vector3 direction)
     {

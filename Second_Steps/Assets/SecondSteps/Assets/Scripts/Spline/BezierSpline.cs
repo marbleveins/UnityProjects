@@ -8,7 +8,7 @@ public class BezierSpline : MonoBehaviour
     [SerializeField]
     private Vector3[] points;
     [SerializeField]
-    private BezierControlPointMode[] modes;
+    private ControlPointMode[] modes;
     
     public int ControlPointCount { get { return points.Length; } }
 
@@ -32,12 +32,12 @@ public class BezierSpline : MonoBehaviour
         EnforceMode(index);
     }
 
-    public BezierControlPointMode GetControlPointMode(int index)
+    public ControlPointMode GetControlPointMode(int index)
     {
         return modes[(index + 1) / 3];
     }
 
-    public void SetControlPointMode(int index, BezierControlPointMode mode)
+    public void SetControlPointMode(int index, ControlPointMode mode)
     {
         modes[(index + 1) / 3] = mode;
         EnforceMode(index);
@@ -46,8 +46,8 @@ public class BezierSpline : MonoBehaviour
     private void EnforceMode(int index)
     {
         int modeIndex = (index + 1) / 3;
-        BezierControlPointMode mode = modes[modeIndex];
-        if (mode == BezierControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Length - 1)
+        ControlPointMode mode = modes[modeIndex];
+        if (mode == ControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Length - 1)
         {
             return;
         }
@@ -67,7 +67,7 @@ public class BezierSpline : MonoBehaviour
 
         Vector3 middle = points[middleIndex];
         Vector3 enforcedTangent = middle - points[fixedIndex];
-        if (mode == BezierControlPointMode.Aligned)
+        if (mode == ControlPointMode.Aligned)
         {
             enforcedTangent = enforcedTangent.normalized * Vector3.Distance(middle, points[enforcedIndex]);
         }
@@ -152,9 +152,9 @@ public class BezierSpline : MonoBehaviour
             new Vector3(4f, 0f, 0f)
         };
 
-        modes = new BezierControlPointMode[] {
-            BezierControlPointMode.Free,
-            BezierControlPointMode.Free
+        modes = new ControlPointMode[] {
+            ControlPointMode.Free,
+            ControlPointMode.Free
         };
     }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,48 +7,148 @@ public class AguSpline : MonoBehaviour
 {
 
     [SerializeField]
-    private Vector3[] points;
-    [SerializeField]
-    private BezierControlPointMode[] modes;
-    
-    public int ControlPointCount { get { return points.Length; } }
+    private ControlPoint[] controlPoints;
+    public List<Node> nodes = new List<Node>();
+    public List<Curve> curves = new List<Curve>();
 
-    public Vector3 GetControlPoint(int index)
+    public int ControlPointsCount { get { return controlPoints.Length; } }
+
+    public float Length;
+
+
+    private void CalculateLength()
     {
-        return points[index];
+        Length = 0;
+        foreach (var curve in curves)
+        {
+            Length += curve.Length;
+        }
+    }
+    public Vector3 GetLocationAlongSpline(float t)
+    {
+        int index = GetNodeIndexForTime(t);
+        return curves[index].GetLocation(t - index);
+    }
+    public Vector3 GetLocationAlongSplineAtDistance(float d)
+    {
+        if (d < 0 || d > Length)
+            throw new ArgumentException(string.Format("Distance must be between 0 and spline length ({0}). Given distance was {1}.", Length, d));
+        foreach (Curve curve in curves)
+        {
+            if (d > curve.Length)
+            {
+                d -= curve.Length;
+            }
+            else
+            {
+                return curve.GetLocationAtDistance(d);
+            }
+        }
+        throw new Exception("Something went wrong with GetLocationAlongSplineAtDistance");
+    }
+    public Vector3 GetOrientationAtTime(float t)//GetTangentAlongSpline
+    {
+        int index = GetNodeIndexForTime(t);
+        return curves[index].GetTangent(t - index);
+    }
+    public Vector3 GetOrientationAtDistance(float d)//GetTangentAlongSplineAtDistance
+    {
+        if (d < 0 || d > Length)
+            throw new ArgumentException(string.Format("Distance must be between 0 and spline length ({0}). Given distance was {1}.", Length, d));
+        foreach (Curve curve in curves)
+        {
+            if (d > curve.Length)
+            {
+                d -= curve.Length;
+            }
+            else
+            {
+                return curve.GetTangentAtDistance(d);
+            }
+        }
+        throw new Exception("Something went wrong with GetTangentAlongSplineAtDistance");
     }
 
-    public void SetControlPoint(int index, Vector3 point)
+    private int GetNodeIndexForTime(float t)
     {
-        if (index % 3 == 0) {
-			Vector3 delta = point - points[index];
-			if (index > 0) {
-				points[index - 1] += delta;
-			}
-			if (index + 1 < points.Length) {
-				points[index + 1] += delta;
-			}
-		}
-        points[index] = point;
-        EnforceMode(index);
+        if (t < 0 || t > nodes.Count - 1)
+        {
+            throw new ArgumentException(string.Format("Time must be between 0 and last node index ({0}). Given time was {1}.", nodes.Count - 1, t));
+        }
+        int res = Mathf.FloorToInt(t);
+        if (res == nodes.Count - 1)
+            res--;
+        return res;
     }
 
-    public BezierControlPointMode GetControlPointMode(int index)
+    public void AddNode(Node node)
     {
-        return modes[(index + 1) / 3];
+        nodes.Add(node);
+        if (nodes.Count != 1)
+        {
+            Node previousNode = nodes[nodes.IndexOf(node) - 1];
+            Curve curve = new Curve(previousNode, node);
+            //curve.Changed.AddListener(() => UpdateAfterCurveChanged());
+            curves.Add(curve);
+        }
+        //RaiseNodeCountChanged();
+        //UpdateAfterCurveChanged();
     }
 
-    public void SetControlPointMode(int index, BezierControlPointMode mode)
+    public void InsertNode(int index, Node node)
     {
-        modes[(index + 1) / 3] = mode;
-        EnforceMode(index);
+        if (index == 0)
+            throw new Exception("Can't insert a node at index 0");
+
+        Node previousNode = nodes[index - 1];
+        Node nextNode = nodes[index];
+
+        nodes.Insert(index, node);
+
+        curves[index - 1].ConnectEnd(node);
+
+        Curve curve = new Curve(node, nextNode);
+        //curve.Changed.AddListener(() => UpdateAfterCurveChanged());
+        curves.Insert(index, curve);
+        //RaiseNodeCountChanged();
+        //UpdateAfterCurveChanged();
     }
 
-    private void EnforceMode(int index)
+    public void RemoveNode(Node node)
+    {
+        int index = nodes.IndexOf(node);
+
+        if (nodes.Count <= 2)
+        {
+            throw new Exception("Can't remove the node because a spline needs at least 2 nodes.");
+        }
+
+        Curve toRemove = index == nodes.Count - 1 ? curves[index - 1] : curves[index];
+        if (index != 0 && index != nodes.Count - 1)
+        {
+            Node nextNode = nodes[index + 1];
+            curves[index - 1].ConnectEnd(nextNode);
+        }
+
+        nodes.RemoveAt(index);
+        //toRemove.Changed.RemoveListener(() => UpdateAfterCurveChanged());
+        curves.Remove(toRemove);
+
+        //RaiseNodeCountChanged();
+        //UpdateAfterCurveChanged();
+    }
+
+    public bool NodeExists(int index)
+    {
+        return index + 1 >= nodes.Count;
+    }
+
+
+    /*private void EnforceMode(int index)
     {
         int modeIndex = (index + 1) / 3;
-        BezierControlPointMode mode = modes[modeIndex];
-        if (mode == BezierControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Length - 1)
+        ControlPointMode mode = modes[modeIndex];
+        if (mode == ControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Length - 1)
         {
             return;
         }
@@ -67,95 +168,71 @@ public class AguSpline : MonoBehaviour
 
         Vector3 middle = points[middleIndex];
         Vector3 enforcedTangent = middle - points[fixedIndex];
-        if (mode == BezierControlPointMode.Aligned)
+        if (mode == ControlPointMode.Aligned)
         {
             enforcedTangent = enforcedTangent.normalized * Vector3.Distance(middle, points[enforcedIndex]);
         }
         points[enforcedIndex] = middle + enforcedTangent;
+    }*/
+
+
+        
+    public ControlPoint GetControlPoint(int index)
+    {
+        return controlPoints[index];
     }
 
-
-    public Vector3 GetPoint(float t)
+    public void SetControlPoint(int index, ControlPoint newCP)
     {
-        int i;
-        if (t >= 1f)
+        if (index % 3 == 0)
         {
-            t = 1f;
-            i = points.Length - 4;
+            Vector3 delta = newCP.position - controlPoints[index].position;
+            if (index > 0)
+            {
+                controlPoints[index - 1].position += delta;
+            }
+            if (index + 1 < controlPoints.Length)
+            {
+                controlPoints[index + 1].position += delta;
+            }
         }
-        else
+        controlPoints[index] = newCP;
+        //EnforceMode(index);
+    }
+
+    public Vector3 GetControlPointLocation(int index)
+    {
+        return controlPoints[index].position;
+    }
+    public void SetControlPointLocation(int index, Vector3 loc)
+    {
+        if (index % 3 == 0)
         {
-            t = Mathf.Clamp01(t) * CurveCount;
-            i = (int)t;
-            t -= i;
-            i *= 3;
+            Vector3 delta = loc - controlPoints[index].position;
+            if (index > 0)
+            {
+                controlPoints[index - 1].position += delta;
+            }
+            if (index + 1 < controlPoints.Length)
+            {
+                controlPoints[index + 1].position += delta;
+            }
         }
-        return transform.TransformPoint(Bezier.GetPoint(
-            points[i], points[i + 1], points[i + 2], points[i + 3], t));
+        controlPoints[index].position = loc;
+        //EnforceMode(index);
     }
 
-    public Vector3 GetVelocity(float t)
+
+    public ControlPointMode GetControlPointMode(int index)
     {
-        int i;
-        if (t >= 1f)
-        {
-            t = 1f;
-            i = points.Length - 4;
-        }
-        else
-        {
-            t = Mathf.Clamp01(t) * CurveCount;
-            i = (int)t;
-            t -= i;
-            i *= 3;
-        }
-        return transform.TransformPoint(Bezier.GetFirstDerivative(
-            points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
+        return controlPoints[index].mode;// modes[(index + 1) / 3];
     }
 
-    public Vector3 GetDirection(float t)
+    public void SetControlPointMode(int index, ControlPointMode mode)
     {
-        return GetVelocity(t).normalized;
+        controlPoints[index].mode = mode;// modes[(index + 1) / 3] = mode;
+        //EnforceMode(index);
     }
 
-    public int CurveCount
-    {
-        get
-        {
-            return (points.Length - 1) / 3;
-        }
-    }
-
-    public void AddCurve()
-    {
-        Vector3 point = points[points.Length - 1];
-        System.Array.Resize(ref points, points.Length + 3);
-        point.z += 1f;
-        points[points.Length - 3] = point;
-        point.z += 1f;
-        points[points.Length - 2] = point;
-        point.z += 1f;
-        points[points.Length - 1] = point;
-
-        System.Array.Resize(ref modes, modes.Length + 1);
-        modes[modes.Length - 1] = modes[modes.Length - 2];
-
-        EnforceMode(points.Length - 4);
-    }
-
-    public void Reset()
-    {
-        points = new Vector3[] {
-            new Vector3(1f, 0f, 0f),
-            new Vector3(2f, 0f, 0f),
-            new Vector3(3f, 0f, 0f),
-            new Vector3(4f, 0f, 0f)
-        };
-
-        modes = new BezierControlPointMode[] {
-            BezierControlPointMode.Free,
-            BezierControlPointMode.Free
-        };
-    }
 
 }
