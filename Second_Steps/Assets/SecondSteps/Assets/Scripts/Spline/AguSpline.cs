@@ -7,11 +7,11 @@ public class AguSpline : MonoBehaviour
 {
 
     [SerializeField]
-    private ControlPoint[] controlPoints;
+    public List<ControlPoint> controlPoints = new List<ControlPoint>();
     public List<Node> nodes = new List<Node>();
     public List<Curve> curves = new List<Curve>();
-
-    public int ControlPointsCount { get { return controlPoints.Length; } }
+    public Node SelectedNode;
+    
 
     public float Length;
 
@@ -182,6 +182,11 @@ public class AguSpline : MonoBehaviour
         return controlPoints[index];
     }
 
+    public void AddControlPoint(ControlPoint cp)
+    {
+        controlPoints.Add(cp);
+    }
+
     public void SetControlPoint(int index, ControlPoint newCP)
     {
         if (index % 3 == 0)
@@ -191,7 +196,7 @@ public class AguSpline : MonoBehaviour
             {
                 controlPoints[index - 1].position += delta;
             }
-            if (index + 1 < controlPoints.Length)
+            if (index + 1 < controlPoints.Count)
             {
                 controlPoints[index + 1].position += delta;
             }
@@ -213,7 +218,7 @@ public class AguSpline : MonoBehaviour
             {
                 controlPoints[index - 1].position += delta;
             }
-            if (index + 1 < controlPoints.Length)
+            if (index + 1 < controlPoints.Count)
             {
                 controlPoints[index + 1].position += delta;
             }

@@ -13,7 +13,6 @@ public class PathCreator : MonoBehaviour {
 
     private void Start()
     {
-        Debug.Log("PathCreator Start");
         spline = GetComponent<AguSpline>();
         StartNewSpline();
 
@@ -32,10 +31,21 @@ public class PathCreator : MonoBehaviour {
         Vector3 dir = new Vector3(0, 0, 0);
         Node node = new Node(pos, dir);
         spline.AddNode(node);
-        pos = new Vector3(0, 0, 0);
+        pos = new Vector3(0, 0, 2);
         dir = new Vector3(0, 0, 0);
         node = new Node(pos, dir);
         spline.AddNode(node);
+
+        ControlPoint cp = new ControlPoint()
+        {
+            position = new Vector3(0, 2, 0)
+        };
+        spline.AddControlPoint(cp);
+        cp = new ControlPoint()
+        {
+            position = new Vector3(0, -2, 0)
+        };
+        spline.AddControlPoint(cp);
     }
 
     private Shape GetFirstShape()

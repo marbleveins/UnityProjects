@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Curve : ScriptableObject
+public class Curve
 {
     private const int STEP_COUNT = 30;
     private const float T_STEP = 1.0f / STEP_COUNT;
 
-    public Node n1, n2;
+    public Node n1, n2, c1, c2;
 
     /// <summary>
     /// Length of the curve in world unit.
@@ -66,7 +66,7 @@ public class Curve : ScriptableObject
     /// <returns></returns>
     public Vector3 GetInverseDirection()
     {
-        return (2 * n2.position) - n2.direction;
+        return (2 * n2.location) - n2.direction;
     }
 
     /// <summary>
@@ -82,10 +82,10 @@ public class Curve : ScriptableObject
         float omt2 = omt * omt;
         float t2 = t * t;
         return
-            n1.position * (omt2 * omt) +
+            n1.location * (omt2 * omt) +
             n1.direction * (3f * omt2 * t) +
             GetInverseDirection() * (3f * omt * t2) +
-            n2.position * (t2 * t);
+            n2.location * (t2 * t);
     }
 
     /// <summary>
@@ -101,10 +101,10 @@ public class Curve : ScriptableObject
         float omt2 = omt * omt;
         float t2 = t * t;
         Vector3 tangent =
-            n1.position * (-omt2) +
+            n1.location * (-omt2) +
             n1.direction * (3 * omt2 - 2 * omt) +
             GetInverseDirection() * (-3 * t2 + 2 * t) +
-            n2.position * (t2);
+            n2.location * (t2);
         return tangent.normalized;
     }
 

@@ -31,35 +31,16 @@ public class AguSplineInspector : Editor
         handleTransform = spline.transform;
         handleRotation = Tools.pivotRotation == PivotRotation.Local ?
             handleTransform.rotation : Quaternion.identity;
-        Debug.Log("OnSceneGUI");
 
+        DrawCurves();
 
-        Vector3 p0;
-        if (spline.NodeExists(0))
-        {
-            p0 = ShowPoint(0);
-        
-            for (int i = 1; i < spline.ControlPointsCount; i += 3)
-            {
-                Vector3 p1 = ShowPoint(i);
-                Vector3 p2 = ShowPoint(i + 1);
-                Vector3 p3 = ShowPoint(i + 2);
-
-                Handles.color = Color.gray;
-                Handles.DrawLine(p0, p1);
-                Handles.DrawLine(p2, p3);
-
-                Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
-                p0 = p3;
-            }
-        }
         ShowDirections();
     }
 
     public override void OnInspectorGUI()
     {
         spline = target as AguSpline;
-        if (selectedIndex >= 0 && selectedIndex < spline.ControlPointsCount)
+        if (selectedIndex >= 0 && selectedIndex < spline.controlPoints.Count)
         {
             DrawSelectedPointInspector();
         }
@@ -69,7 +50,6 @@ public class AguSplineInspector : Editor
     {
         GUILayout.Label("Selected Point");
         EditorGUI.BeginChangeCheck();
-        Debug.Log("primerControlP");
         Vector3 loc = EditorGUILayout.Vector3Field("Position", spline.GetControlPoint(selectedIndex).position);
         if (EditorGUI.EndChangeCheck())
         {
@@ -79,7 +59,7 @@ public class AguSplineInspector : Editor
         }
 
         EditorGUI.BeginChangeCheck();
-        ControlPointMode mode = (ControlPointMode) EditorGUILayout.EnumPopup("Mode", spline.GetControlPointMode(selectedIndex));
+        ControlPointMode mode = (ControlPointMode)EditorGUILayout.EnumPopup("Mode", spline.GetControlPointMode(selectedIndex));
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(spline, "Change Point Mode");
@@ -88,22 +68,74 @@ public class AguSplineInspector : Editor
         }
     }
 
-    private void ShowDirections()
+    private void DrawCurves()
     {
-        Handles.color = Color.green;
-        Vector3 point = spline.GetLocationAlongSpline(0f);
-        Handles.DrawLine(point, point + spline.GetOrientationAtTime(0f) * directionScale);
-        int steps = stepsPerCurve * spline.curves.Count;
-        for (int i = 1; i <= steps; i++)
+        if (spline.curves.Count > 0 && spline.controlPoints.Count > 0)
         {
-            point = spline.GetLocationAlongSpline(i / (float)steps);
-            Handles.DrawLine(point, point + spline.GetOrientationAtTime(i / (float)steps) * directionScale);
+            Handles.color = Color.gray;
+            for (int i = 0; i < spline.curves.Count; i++)
+            {
+                Handles.DrawBezier(spline.transform.TransformPoint(spline.curves[i].n1.location),
+                    spline.transform.TransformPoint(spline.curves[i].n2.location),
+                    spline.transform.TransformPoint(spline.curves[i].n1.direction),
+                    spline.transform.TransformPoint(spline.curves[i].GetInverseDirection()),
+                    Color.white,
+                    null,
+                    2f);
+                Handles.DrawLine(spline.curves[i].n1.location, spline.GetControlPointLocation(i * 2 + 0));
+                Handles.DrawLine(spline.curves[i].n2.location, spline.GetControlPointLocation(i * 2 + 1));
+
+                Handles.Button(spline.curves[i].n1.location, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Handles.Button(spline.curves[i].n2.location, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Handles.Button(spline.GetControlPointLocation(i * 2 + 0), handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Handles.Button(spline.GetControlPointLocation(i * 2 + 1), handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Repaint();
+            }
+
+        }
+    }
+    private void DrawCurvesOld()
+    {
+        Vector3 p0;
+        if (spline.NodeExists(0))
+        {
+            p0 = ShowNode(0);
+
+            for (int i = 1; i < spline.controlPoints.Count; i += 3)
+            {
+                Vector3 p1 = ShowNode(i);
+                Vector3 p2 = ShowNode(i + 1);
+                Vector3 p3 = ShowNode(i + 2);
+
+                Handles.color = Color.gray;
+                Handles.DrawLine(p0, p1);
+                Handles.DrawLine(p2, p3);
+
+                Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
+                p0 = p3;
+            }
         }
     }
 
-    private Vector3 ShowPoint(int index)
+    private void ShowDirections()
     {
-        Debug.Log("ShowPoint: " + index);
+        if (spline.nodes.Count > 0)
+        {
+            Handles.color = Color.green;
+            Vector3 point = spline.GetLocationAlongSpline(0f);
+            Handles.DrawLine(point, point + spline.GetOrientationAtTime(0f) * directionScale);
+            int steps = stepsPerCurve * spline.curves.Count;
+            for (int i = 1; i <= steps; i++)
+            {
+                point = spline.GetLocationAlongSpline(i / (float)steps);
+                Handles.DrawLine(point, point + spline.GetOrientationAtTime(i / (float)steps) * directionScale);
+            }
+
+        }
+    }
+
+    private Vector3 ShowNode(int index)
+    {
 
         Vector3 point = handleTransform.TransformPoint(spline.GetControlPoint(index).position);
         float size = HandleUtility.GetHandleSize(point);
