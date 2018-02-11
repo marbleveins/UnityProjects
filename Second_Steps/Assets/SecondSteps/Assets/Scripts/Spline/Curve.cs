@@ -79,8 +79,7 @@ public class Curve
     {
         if (t < 0 || t > 1)
             throw new ArgumentException("Time must be between 0 and 1. Given time was " + t);
-        //Debug.Log(string.Format("1: {0}  -  2: {1}  -  3: {2}  -  4: {3}", nodoInicio.position, c1.position, c2.position, nodoFin.position));
-        return Bezier.CalculateQubicBezierPoint(t, nodoInicio.position, c1.position, c2.position, nodoFin.position);
+        return Bezier.GetPoint(nodoInicio.position, c1.position, c2.position, nodoFin.position, t);
         /*
         float omt = 1f - t;
         float omt2 = omt * omt;

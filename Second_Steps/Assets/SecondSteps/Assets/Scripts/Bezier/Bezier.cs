@@ -59,7 +59,7 @@ public static class Bezier
 
         return (p0 * (-omt2) +
                 p1 * (3f * omt2 - 2 * omt) +
-                p2 * (3f * t2 + 2 * t) +
+                p2 * (-3f * t2 + 2 * t) +//3f lo cambié por -3f y dibujó bien. revisar si asi deberia ser o está mal en otro lado
                 p3 * t2).normalized;
     }
 
@@ -127,25 +127,25 @@ public static class Bezier
     public static Vector3 CalculateQuadraticBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2)
     {
         //B(t) = (1 - t)2P0 + 2(1 - t)tP1 + t2P2
-        var u = 1 - t;
-        var uu = u * u;
-        var ut2 = 2 * u * t;
+        var omt = 1 - t;
+        var omt2 = omt * omt;
+        var ut2 = 2 * omt * t;
         var tt = t * t;
 
-        return uu * p0 + ut2 * p1 + tt * p2;
+        return omt2 * p0 + ut2 * p1 + tt * p2;
     }
 
     public static Vector3 CalculateQubicBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
     {
         //B(t) = (1-t)3P0 + 3(1-t)2tP1 + 3(1-t)t2P2 + t3P3
-        var u = 1 - t;
-        var uu = u * u;
-        var uuu = u * u * u;
-        var ut2 = 2 * u * t;
+        var omt = 1 - t;
+        var omt2 = omt * omt;
+        var omt3 = omt * omt * omt;
+        var ut2 = 2 * omt * t;
         var tt = t * t;
         var ttt = t * t * t;
 
-        return uuu * p0 + 3 * uu * t * p1 + 3 * u * ttt * p2 + ttt * p3;
+        return omt3 * p0 + 3 * omt2 * t * p1 + 3 * omt * ttt * p2 + ttt * p3;
     }
 
 
