@@ -1,41 +1,163 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NewSpline : MonoBehaviour
 {
 
-    public List<Node> nodes = new List<Node>();
+    public List<Node> points = new List<Node>();
     public List<Curve> curves = new List<Curve>();
 
+    //private List<Node> GetPoints()
+    //{
+    //    return new List<Node>().AddRange()
+    //}
+    public int breaks = 10;
+    public bool breaksFixedOnlyTrue = true;
 
 
-    public void AddNewDefaultCurve()
+    /// <summary>
+    /// Public Functions
+    /// </summary>
+    #region Public Functions
+
+
+    public void AddDefaultCurve()
     {
-        Node n1, n2, c1, c2;
-        if (nodes.Count == 0)
+        if (points.Count == 0)
         {
-            n1 = new Node(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+            AddCurve(GetANewFirstCurve());
         }
         else
         {
-            n1 = nodes[nodes.Count - 1];
+            throw new Exception("AddCurve(GetNextCurve()) - no deberia");
+            AddCurve(GetNextCurve());
         }
-        n2 = new Node(new Vector3(n1.location.x + 10, n1.location.y, n1.location.z), new Vector3(n1.direction.x + 10, n1.direction.y, n1.direction.z));
-
-        c1 = new Node(new Vector3(n1.location.x, n1.location.y + 10, n1.location.z), new Vector3(n1.direction.x, n1.direction.y + 10, n1.direction.z));
-        c2 = new Node(new Vector3(n2.location.x, n2.location.y + 10, n2.location.z), new Vector3(n2.direction.x, n2.direction.y + 10, n2.direction.z));
-
-        nodes.Add(n1);
-        nodes.Add(c1);
-        nodes.Add(c2);
-        nodes.Add(n2);
-
-        Curve curve = new Curve(n1, n2);
-        curve.c1 = c1;
-        curve.c2 = c2;
-        curves.Add(curve);
 
     }
+
+    public void AddCurve(Curve cu)
+    {
+        points.Add(cu.nodoInicio);
+        points.Add(cu.c1);
+        points.Add(cu.c2);
+        points.Add(cu.nodoFin);
+        curves.Add(cu);
+    }
+    public Vector3 GetPositionAtTime(float t)
+    {
+        int curveIndex = GetCurveIndexForTime(t);
+        return curves[curveIndex].GetLocation(t - curveIndex);
+    }
+    public Vector3 GetOrientationAtTime(float t)//GetTangentAlongSpline
+    {
+        int index = GetCurveIndexForTime(t);
+        return curves[index].GetTangent(t - index);
+    }
+
+
+    #endregion
+
+
+    /// <summary>
+    /// Private Methods
+    /// </summary>
+    #region Private Methods
+
+
+    private int GetCurveIndexForTime(float t)
+    {
+        if (t < 0 || t > curves.Count)
+        {
+            throw new ArgumentException(string.Format("Time must be between 0 and last node index ({0}). Given time was {1}.", points.Count - 1, t));
+        }
+        int index = Mathf.FloorToInt(t);
+        if (index == curves.Count)
+            index--;// ej;si hay una sola curva, t = 1 tiene que devolver index 0
+        return index;
+    }
+
+    private int NodeCountOnly
+    {
+        get { return points.Count - curves.Count * 2; }
+    }
+
+
+    private Curve GetANewFirstCurve()
+    {
+        if (points.Count != 0)
+        {
+            throw new Exception("Error - intentando agregar la primer curva habiendo curvas..cantidad :" + curves.Count);
+        }
+
+        Node head, tail, c1, c2;
+        Vector3 c1pos, c1dir, c2pos, c2dir;
+
+        head = new Node(Vector3.zero, Vector3.up);
+
+         tail = new Node(head.position + (Vector3.right * 10), Vector3.up);
+
+        c1pos = head.position + (Vector3.up * 10);
+        c1dir = Vector3.up;
+
+        c2pos = tail.position + (Vector3.up * 10);
+        c2dir = Vector3.up;
+
+
+        c1 = new Node(c1pos, c1dir);
+        c2 = new Node(c2pos, c2dir);
+
+        points.Add(head);
+        points.Add(c1);
+        points.Add(c2);
+        points.Add(tail);
+
+        return new Curve(head, tail)
+        {
+            c1 = c1,
+            c2 = c2
+        };
+    }
+    private Curve GetNextCurve()
+    {
+        if (points.Count == 0)
+        {
+            throw new Exception("Error - intentando agregar una curva pero no fue inizializada");
+        }
+
+        Node inicio, fin, c1, c2;
+        Vector3 c1pos, c1dir, c2pos, c2dir;
+        float curveLength = 10;
+
+        inicio = points[points.Count - 1];
+
+
+        Vector3 tailOffset = new Vector3(inicio.position.x + curveLength, inicio.position.y + curveLength, inicio.position.z + curveLength);
+        fin = new Node(tailOffset, inicio.direction);
+
+        Vector3 prevC1pos = points[points.Count - 2].position;
+        c1pos = new Vector3(inicio.position.x + curveLength, inicio.position.y + curveLength, inicio.position.z + curveLength);
+        c1dir = inicio.direction;
+        c2pos = fin.position + (Vector3.up * 10);
+        c2dir = Vector3.up;
+
+
+
+        //add
+        c1 = new Node(c1pos, c1dir);
+        c2 = new Node(c2pos, c2dir);
+        points.Add(inicio);
+        points.Add(c1);
+        points.Add(c2);
+        points.Add(fin);
+        return new Curve(inicio, fin)
+        {
+            c1 = c1,
+            c2 = c2
+        };
+    }
+
+    #endregion
 }

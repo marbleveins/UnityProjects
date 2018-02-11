@@ -11,67 +11,83 @@ public class NewSplineInspector : Editor {
     private Transform handleTransform;
     private const float handleSize = 0.04f;
     private const float pickSize = 0.06f;
-
-    private bool splineOn = false;
+    private const float directionineScale = 0.8f;
+    
 
     private NewSpline spline;
+    
 
-    private int selectedNodeIndex;
-    private Node selectedNode;
+
 
     private void OnSceneGUI()
     {
         spline = target as NewSpline;
-
-        if (splineOn)
+        
+        if (spline.points.Count > 0)
         {
             handleTransform = spline.transform;
             handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
             DrawHandles();
             DrawCurves();
+            DrawDirections();
         }
         else
         {
             StartNewSpline();
         }
-
+        
     }
 
 
     private void StartNewSpline()
     {
-        spline.AddNewDefaultCurve();
-
-
-
-
-
-        splineOn = true;
+        spline.points.Clear();
+        spline.curves.Clear();
+        spline.AddDefaultCurve();
+                
     }
 
 
     private void DrawHandles()
     {
-        foreach(Node node in spline.nodes)
+        foreach (Node node in spline.points)
         {
-            Handles.Button(node.location, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+            Handles.Button(node.position, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
         }
     }
 
     private void DrawCurves()
     {
-        for (int i = 0; i < spline.curves.Count; i++)
+        foreach(Curve curve in spline.curves)
         {
-            Handles.DrawBezier(spline.transform.TransformPoint(spline.curves[i].n1.location),
-                spline.transform.TransformPoint(spline.curves[i].n2.location),
-                spline.transform.TransformPoint(spline.curves[i].n1.direction),
-                spline.transform.TransformPoint(spline.curves[i].GetInverseDirection()),
+            Handles.DrawBezier(spline.transform.TransformPoint(curve.nodoInicio.position),
+                spline.transform.TransformPoint(curve.nodoFin.position),
+                spline.transform.TransformPoint(curve.c1.position),
+                spline.transform.TransformPoint(curve.GetInverseDirection()),
                 Color.white,
                 null,
                 2f);
-            Handles.DrawLine(spline.curves[i].n1.location, spline.curves[i].c1.location);
-            Handles.DrawLine(spline.curves[i].n2.location, spline.curves[i].c2.location);
+            Handles.DrawLine(curve.nodoInicio.position, curve.c1.position);
+            Handles.DrawLine(curve.nodoFin.position, curve.c2.position);
+        }
+    }
+
+    private void DrawDirections()
+    {
+        if (spline.points.Count > 0)
+        {
+            Handles.color = Color.green;
+
+            Vector3 point = spline.GetPositionAtTime(0f);
+            Handles.DrawLine(point, point + spline.GetOrientationAtTime(0f) * directionineScale);
+            int steps = spline.breaks * spline.curves.Count;
+            for (int i = 1; i <= steps; i++)
+            {
+                point = spline.GetPositionAtTime(i / (float)steps);
+                Handles.DrawLine(point, point + spline.GetOrientationAtTime(i / (float)steps) * directionineScale);
+            }
+
         }
     }
 

@@ -9,7 +9,7 @@ public class Curve
     private const int STEP_COUNT = 30;
     private const float T_STEP = 1.0f / STEP_COUNT;
 
-    public Node n1, n2, c1, c2;
+    public Node nodoInicio, nodoFin, c1, c2;
 
     /// <summary>
     /// Length of the curve in world unit.
@@ -29,11 +29,11 @@ public class Curve
     /// <param name="n2"></param>
     public Curve(Node n1, Node n2)
     {
-        this.n1 = n1;
-        this.n2 = n2;
+        this.nodoInicio = n1;
+        this.nodoFin = n2;
         n1.Changed.AddListener(() => ComputePoints());
         n2.Changed.AddListener(() => ComputePoints());
-        ComputePoints();
+        //ComputePoints();
     }
 
     /// <summary>
@@ -42,8 +42,8 @@ public class Curve
     /// <param name="n1"></param>
     public void ConnectStart(Node n1)
     {
-        this.n1.Changed.RemoveListener(() => ComputePoints());
-        this.n1 = n1;
+        this.nodoInicio.Changed.RemoveListener(() => ComputePoints());
+        this.nodoInicio = n1;
         n1.Changed.AddListener(() => ComputePoints());
         ComputePoints();
     }
@@ -54,8 +54,8 @@ public class Curve
     /// <param name="n2"></param>
     public void ConnectEnd(Node n2)
     {
-        this.n2.Changed.RemoveListener(() => ComputePoints());
-        this.n2 = n2;
+        this.nodoFin.Changed.RemoveListener(() => ComputePoints());
+        this.nodoFin = n2;
         n2.Changed.AddListener(() => ComputePoints());
         ComputePoints();
     }
@@ -66,7 +66,8 @@ public class Curve
     /// <returns></returns>
     public Vector3 GetInverseDirection()
     {
-        return (2 * n2.location) - n2.direction;
+        return c2.position;
+        //return (2 * nodoFin.position) - nodoFin.direction;
     }
 
     /// <summary>
@@ -78,14 +79,18 @@ public class Curve
     {
         if (t < 0 || t > 1)
             throw new ArgumentException("Time must be between 0 and 1. Given time was " + t);
+        //Debug.Log(string.Format("1: {0}  -  2: {1}  -  3: {2}  -  4: {3}", nodoInicio.position, c1.position, c2.position, nodoFin.position));
+        return Bezier.CalculateQubicBezierPoint(t, nodoInicio.position, c1.position, c2.position, nodoFin.position);
+        /*
         float omt = 1f - t;
         float omt2 = omt * omt;
         float t2 = t * t;
         return
-            n1.location * (omt2 * omt) +
-            n1.direction * (3f * omt2 * t) +
+            nodoInicio.position * (omt2 * omt) +
+            nodoInicio.direction * (3f * omt2 * t) +
             GetInverseDirection() * (3f * omt * t2) +
-            n2.location * (t2 * t);
+            nodoFin.position * (t2 * t);
+        */
     }
 
     /// <summary>
@@ -97,15 +102,18 @@ public class Curve
     {
         if (t < 0 || t > 1)
             throw new ArgumentException("Time must be between 0 and 1. Given time was " + t);
+        return Bezier.GetTangent(nodoInicio.position, c1.position, c2.position, nodoFin.position, t);
+        /*
         float omt = 1f - t;
         float omt2 = omt * omt;
         float t2 = t * t;
         Vector3 tangent =
-            n1.location * (-omt2) +
-            n1.direction * (3 * omt2 - 2 * omt) +
+            nodoInicio.position * (-omt2) +
+            nodoInicio.direction * (3 * omt2 - 2 * omt) +
             GetInverseDirection() * (-3 * t2 + 2 * t) +
-            n2.location * (t2);
+            nodoFin.position * (t2);
         return tangent.normalized;
+        */
     }
 
     //Es necesario guardar una lista de CurveSample? no se es mejor tener las 2 listas por separado como el spline?

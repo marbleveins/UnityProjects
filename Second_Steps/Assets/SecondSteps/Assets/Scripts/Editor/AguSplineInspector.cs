@@ -75,18 +75,18 @@ public class AguSplineInspector : Editor
             Handles.color = Color.gray;
             for (int i = 0; i < spline.curves.Count; i++)
             {
-                Handles.DrawBezier(spline.transform.TransformPoint(spline.curves[i].n1.location),
-                    spline.transform.TransformPoint(spline.curves[i].n2.location),
-                    spline.transform.TransformPoint(spline.curves[i].n1.direction),
+                Handles.DrawBezier(spline.transform.TransformPoint(spline.curves[i].nodoInicio.position),
+                    spline.transform.TransformPoint(spline.curves[i].nodoFin.position),
+                    spline.transform.TransformPoint(spline.curves[i].nodoInicio.direction),
                     spline.transform.TransformPoint(spline.curves[i].GetInverseDirection()),
                     Color.white,
                     null,
                     2f);
-                Handles.DrawLine(spline.curves[i].n1.location, spline.GetControlPointLocation(i * 2 + 0));
-                Handles.DrawLine(spline.curves[i].n2.location, spline.GetControlPointLocation(i * 2 + 1));
+                Handles.DrawLine(spline.curves[i].nodoInicio.position, spline.GetControlPointLocation(i * 2 + 0));
+                Handles.DrawLine(spline.curves[i].nodoFin.position, spline.GetControlPointLocation(i * 2 + 1));
 
-                Handles.Button(spline.curves[i].n1.location, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
-                Handles.Button(spline.curves[i].n2.location, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Handles.Button(spline.curves[i].nodoInicio.position, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
+                Handles.Button(spline.curves[i].nodoFin.position, handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
                 Handles.Button(spline.GetControlPointLocation(i * 2 + 0), handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
                 Handles.Button(spline.GetControlPointLocation(i * 2 + 1), handleRotation, 2f * handleSize, 2f * pickSize, Handles.DotHandleCap);
                 Repaint();

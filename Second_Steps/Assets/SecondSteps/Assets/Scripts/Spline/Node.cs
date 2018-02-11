@@ -6,7 +6,7 @@ using UnityEngine.Events;
 public class Node
 {
     
-    public Vector3 location;
+    public Vector3 position;
     public Vector3 direction;
     public ControlPointMode mode;
 
@@ -18,11 +18,11 @@ public class Node
 
     public void SetPosition(Vector3 p)
     {
-        if (!location.Equals(p))
+        if (!position.Equals(p))
         {
-            location.x = p.x;
-            location.y = p.y;
-            location.z = p.z;
+            position.x = p.x;
+            position.y = p.y;
+            position.z = p.z;
         }
     }
 
