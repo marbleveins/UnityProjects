@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,12 +27,14 @@ public class Curve
     /// </summary>
     /// <param name="n1"></param>
     /// <param name="n2"></param>
-    public Curve(Node n1, Node n2)
+    public Curve(Node inicio, Node c1, Node c2, Node fin)
     {
-        this.nodoInicio = n1;
-        this.nodoFin = n2;
-        n1.Changed.AddListener(() => ComputePoints());
-        n2.Changed.AddListener(() => ComputePoints());
+        this.nodoInicio = inicio;
+        this.c1 = c1;
+        this.c2 = c2;
+        this.nodoFin = fin;
+        //n1.Changed.AddListener(() => ComputePoints());
+        //n2.Changed.AddListener(() => ComputePoints());
         //ComputePoints();
     }
 

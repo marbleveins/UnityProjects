@@ -16,7 +16,20 @@ public class NewSpline : MonoBehaviour
     //}
     public int breaks = 10;
     public bool breaksFixedOnlyTrue = true;
+    public bool relativePosition = true;
 
+    private Vector3 InitialPosition
+    {
+        get
+        {
+            return (relativePosition) ?
+              new Vector3(transform.position.x,
+              transform.position.y,
+              transform.position.z)
+              :
+              Vector3.zero;
+        }
+    }
 
     /// <summary>
     /// Public Functions
@@ -32,7 +45,7 @@ public class NewSpline : MonoBehaviour
         }
         else
         {
-            throw new Exception("AddCurve(GetNextCurve()) - no deberia");
+            //throw new Exception("AddCurve(GetNextCurve()) - no deberia");
             AddCurve(GetNextCurve());
         }
 
@@ -87,38 +100,24 @@ public class NewSpline : MonoBehaviour
 
     private Curve GetANewFirstCurve()
     {
-        if (points.Count != 0)
-        {
-            throw new Exception("Error - intentando agregar la primer curva habiendo curvas..cantidad :" + curves.Count);
-        }
 
-        Node head, tail, c1, c2;
+        Node inicio, fin, c1, c2;
         Vector3 c1pos, c1dir, c2pos, c2dir;
+        inicio = new Node(InitialPosition, Vector3.back);
 
-        head = new Node(Vector3.zero, Vector3.up);
+        fin = new Node(inicio.position + (Vector3.right * 15), Vector3.back);
 
-         tail = new Node(head.position + (Vector3.right * 10), Vector3.up);
+        c1pos = inicio.position + (Vector3.back * 10);
+        c1dir = Vector3.back;
 
-        c1pos = head.position + (Vector3.up * 10);
-        c1dir = Vector3.up;
-
-        c2pos = tail.position + (Vector3.up * 10);
-        c2dir = Vector3.up;
+        c2pos = fin.position + (Vector3.forward * 10);
+        c2dir = Vector3.forward;
 
 
         c1 = new Node(c1pos, c1dir);
         c2 = new Node(c2pos, c2dir);
 
-        points.Add(head);
-        points.Add(c1);
-        points.Add(c2);
-        points.Add(tail);
-
-        return new Curve(head, tail)
-        {
-            c1 = c1,
-            c2 = c2
-        };
+        return new Curve(inicio, c1, c2, fin);
     }
     private Curve GetNextCurve()
     {
@@ -137,27 +136,22 @@ public class NewSpline : MonoBehaviour
         Vector3 tailOffset = new Vector3(inicio.position.x + curveLength, inicio.position.y + curveLength, inicio.position.z + curveLength);
         fin = new Node(tailOffset, inicio.direction);
 
-        Vector3 prevC1pos = points[points.Count - 2].position;
-        c1pos = new Vector3(inicio.position.x + curveLength, inicio.position.y + curveLength, inicio.position.z + curveLength);
+        Vector3 prevC1pos = points[points.Count - 3].position;
+        Vector3 prevC2pos = points[points.Count - 2].position;
+        c1pos = new Vector3(prevC1pos.x + curveLength, prevC1pos.y + curveLength, prevC1pos.z + curveLength);
         c1dir = inicio.direction;
-        c2pos = fin.position + (Vector3.up * 10);
-        c2dir = Vector3.up;
+        c2pos = new Vector3(prevC2pos.x + curveLength, prevC2pos.y + curveLength, prevC2pos.z + curveLength);
+        c2dir = inicio.direction * -1;
 
 
 
         //add
         c1 = new Node(c1pos, c1dir);
         c2 = new Node(c2pos, c2dir);
-        points.Add(inicio);
-        points.Add(c1);
-        points.Add(c2);
-        points.Add(fin);
-        return new Curve(inicio, fin)
-        {
-            c1 = c1,
-            c2 = c2
-        };
+
+        return new Curve(inicio, c1, c2, fin);
     }
 
     #endregion
+
 }

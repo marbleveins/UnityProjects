@@ -290,8 +290,6 @@
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Mesher\MeshBender2.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Mesher\Shape.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Path.cs" />
-    <Compile Include="Assets\SecondSteps\Assets\Scripts\PathCreator.cs" />
-    <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\AguSpline.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\BezierSpline.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\ControlPoint.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\Curve.cs" />
