@@ -7,6 +7,7 @@ public class Path : MonoBehaviour {
 
     [SerializeField]
     private NewSpline spline;
+    private Extruder extruder;
     public List<Vertex> ShapeVertices = new List<Vertex>();
     public Shape shape;
 
@@ -20,6 +21,7 @@ public class Path : MonoBehaviour {
     private void Start()
     {
         spline = GetComponent<NewSpline>();
+        extruder = GetComponent<Extruder>();
         StartNewSpline();
 
         mf = GetComponent<MeshFilter>();
@@ -28,11 +30,15 @@ public class Path : MonoBehaviour {
             mf.sharedMesh = new Mesh();
         }
 
+        FormShapeVertices();
         shape = GetFirstShape();
+        extruder.Generate();
     }
 
     private void StartNewSpline()
     {
+        spline.points.Clear();
+        spline.curves.Clear();
         spline.AddDefaultCurve();
     }
 
@@ -42,6 +48,21 @@ public class Path : MonoBehaviour {
         return shape;
     }
 
+    private void FormShapeVertices()
+    {
+        ShapeVertices.Clear();
+
+        ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
+
+        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
+
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
+
+    }
     public void GetNewPath()
     {
 

@@ -70,6 +70,17 @@ public class NewSpline : MonoBehaviour
         return curves[index].GetTangent(t - index);
     }
 
+    public List<OrientedPoint> GetPath()
+    {
+        var path = new List<OrientedPoint>();
+        for (float t = 0; t < curves.Count; t += 1 / 10.0f)
+        {
+            var point = GetPositionAtTime(t);
+            var rotation = Curve.GetRotationFromTangent(GetOrientationAtTime(t));
+            path.Add(new OrientedPoint(point, rotation));
+        }
+        return path;
+    }
 
     #endregion
 

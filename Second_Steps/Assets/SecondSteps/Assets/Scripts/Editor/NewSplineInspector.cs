@@ -16,9 +16,9 @@ public class NewSplineInspector : Editor
 
 
     private NewSpline spline;
-
+    
     private Node selectedNode;
-
+    
     public override void OnInspectorGUI()
     {//movimiento de los inspector en la ventana Scene 
 
@@ -139,11 +139,16 @@ public class NewSplineInspector : Editor
             Vector3 point = spline.GetPositionAtTime(0f);
             Handles.DrawLine(point, point + spline.GetOrientationAtTime(0f) * directionScale);
             int steps = spline.breaks * spline.curves.Count;
-            for (int i = 1; i <= steps; i++)
+            for (float t = 0; t <= spline.curves.Count; t += 1 / (float)spline.breaks)
+            {
+                point = spline.GetPositionAtTime(t);
+                Handles.DrawLine(point, point + spline.GetOrientationAtTime(t) * directionScale);
+            }
+            /*for (int i = 1; i <= steps; i++)
             {
                 point = spline.GetPositionAtTime(i / (float)spline.breaks);
                 Handles.DrawLine(point, point + spline.GetOrientationAtTime(i / (float)steps) * directionScale);
-            }
+            }*/
 
         }
     }

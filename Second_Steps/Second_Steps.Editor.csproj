@@ -289,8 +289,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\BezierSplineInspector.cs" />
+    <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\ExtruderEditor.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\NewSplineInspector.cs" />
-    <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\SplineExtrusion2Editor.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Editor\SplineInspector.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Editor\SplineEditor.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Editor\SplineExtrusionEditor.cs" />

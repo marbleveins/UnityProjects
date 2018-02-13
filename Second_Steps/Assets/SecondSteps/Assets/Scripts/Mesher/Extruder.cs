@@ -7,13 +7,13 @@ using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Spline))]
+[RequireComponent(typeof(NewSpline))]
 public class Extruder : MonoBehaviour
 {
 
     private MeshFilter mf;
 
-    public Spline spline;
+    public NewSpline spline;
     public float TextureScale = 1;
     public List<Vertex> ShapeVertices = new List<Vertex>();
 
@@ -22,18 +22,16 @@ public class Extruder : MonoBehaviour
     private void Reset()
     {
         ShapeVertices.Clear();
-        ShapeVertices.Add(new Vertex(new Vector2(0, 0.5f), new Vector2(0, 1), 0));
-        ShapeVertices.Add(new Vertex(new Vector2(1, -0.5f), new Vector2(1, -1), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1, -0.5f), new Vector2(-1, -1), 0.66f));
 
+        ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
 
+        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
 
-
-        ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, 1), 0));
-        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(-1, 1), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(1, 1), 0.33f));
-
-        ShapeVertices.Add(new Vertex(new Vector2(-1, -0.5f), new Vector2(-1, -1), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
 
         toUpdate = true;
         OnEnable();
@@ -47,13 +45,13 @@ public class Extruder : MonoBehaviour
     private void OnEnable()
     {
         mf = GetComponent<MeshFilter>();
-        spline = GetComponent<Spline>();
+        spline = GetComponent<NewSpline>();
         if (mf.sharedMesh == null)
         {
             mf.sharedMesh = new Mesh();
         }
-        spline.NodeCountChanged.AddListener(() => toUpdate = true);
-        spline.CurveChanged.AddListener(() => toUpdate = true);
+        //spline.NodeCountChanged.AddListener(() => toUpdate = true);
+        //spline.CurveChanged.AddListener(() => toUpdate = true);
     }
 
     private void Update()
@@ -65,24 +63,11 @@ public class Extruder : MonoBehaviour
         }
     }
 
-    private List<OrientedPoint> GetPath()
-    {//esto deberia ser Spline.GetList() y que haga esto mismo pero adentro porque el spline se mantiene con varios arrays en vez de 1
-        // una vez hecho el spline, moverlo
-        var path = new List<OrientedPoint>();
-        for (float t = 0; t < spline.nodes.Count - 1; t += 1 / 10.0f)
-        {
-            var point = spline.GetLocationAlongSpline(t);
-            var rotation = CubicBezierCurve.GetRotationFromTangent(spline.GetTangentAlongSpline(t));
-            path.Add(new OrientedPoint(point, rotation));
-        }
-        return path;
-    }
-
     public void Generate()
     {
-        List<OrientedPoint> path = GetPath();
+        List<OrientedPoint> path = spline.GetPath();
         Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
-        int[] triangleIndices = GenerateTriangles(path.Count - 1, shape.verticesCount);
+        int[] triangleIndices = GenerateTriangles(path.Count, shape.verticesCount);
 
         SetMesh(shape, triangleIndices);
     }
@@ -96,22 +81,22 @@ public class Extruder : MonoBehaviour
         mf.sharedMesh.triangles = triangleIndices;
     }
 
-    private int[] GenerateTriangles(int segments, int vertices)
+    private int[] GenerateTriangles(int segments, int shapeVertices)
     {
 
         int index = 0;
-        int trianglesAmount = vertices * 2 * segments * 3;
-        int[] triangleIndices = new int[trianglesAmount];
+        int trianglesAmount = shapeVertices * 2 * segments;
+        int[] triangleIndices = new int[trianglesAmount * 3];
 
         for (int i = 0; i < segments; i++)
         {
-            for (int j = 0; j < vertices; j++)
+            for (int j = 0; j < shapeVertices; j++)
             {
-                int offset = j == vertices - 1 ? -(vertices - 1) : 1;
-                int a = index + vertices;
+                int offset = j == shapeVertices - 1 ? -(shapeVertices - 1) : 1;
+                int a = index + shapeVertices;
                 int b = index;
                 int c = index + offset;
-                int d = index + offset + vertices;
+                int d = index + offset + shapeVertices;
 
                 triangleIndices[index * 6 + 0] = c;
                 triangleIndices[index * 6 + 1] = b;

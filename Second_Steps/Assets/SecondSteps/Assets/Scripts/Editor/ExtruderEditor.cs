@@ -11,11 +11,11 @@ public class ExtruderEditor : Editor
     private SerializedProperty textureScale;
     private SerializedProperty vertices;
 
-    private Extruder se;
+    private Extruder extruder;
     private Vertex selection = null;
 
     private void OnEnable() {
-        se = (Extruder)target;
+        extruder = (Extruder)target;
         textureScale = serializedObject.FindProperty("TextureScale");
         vertices = serializedObject.FindProperty("ShapeVertices");
     }
@@ -24,7 +24,7 @@ public class ExtruderEditor : Editor
     {
         Event e = Event.current;
         if (e.type == EventType.MouseDown) {
-            Undo.RegisterCompleteObjectUndo(se, "change extruded shape");
+            Undo.RegisterCompleteObjectUndo(extruder, "change extruded shape");
             // if control key pressed, we will have to create a new vertex if position is changed
             if (e.alt) {
                 mustCreateNewNode = true;
@@ -34,14 +34,14 @@ public class ExtruderEditor : Editor
             mustCreateNewNode = false;
         }
 
-        Vector3 splineStartTangent = se.spline.GetTangentAlongSpline(0);
-        Vector3 splineStart = se.spline.GetLocationAlongSpline(0);
+        Vector3 splineStartTangent = extruder.spline.GetOrientationAtTime(0);
+        Vector3 splineStart = extruder.spline.GetPositionAtTime(0);
         Quaternion q = CubicBezierCurve.GetRotationFromTangent(splineStartTangent);
 
-        foreach (Vertex v in se.ShapeVertices) {
+        foreach (Vertex v in extruder.ShapeVertices) {
             // we create point and normal relative to the spline start where the shape is drawn
-            Vector3 point = se.transform.TransformPoint(q * v.point + splineStart);
-            Vector3 normal = se.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
+            Vector3 point = extruder.transform.TransformPoint(q * v.point + splineStart);
+            Vector3 normal = extruder.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
 
             if (v == selection) {
                 // draw the handles for selected vertex position and normal
@@ -52,32 +52,32 @@ public class ExtruderEditor : Editor
                 Vector3 movedPoint = Handles.Slider2D(0, point, splineStartTangent, Vector3.right, Vector3.up, size, Handles.CircleHandleCap, new Vector2(snap, snap));
                 if(movedPoint != point) {
                     // position has been moved
-                    Vector2 newVertexPoint = Quaternion.Inverse(q) * (se.transform.InverseTransformPoint(movedPoint) - splineStart);
+                    Vector2 newVertexPoint = Quaternion.Inverse(q) * (extruder.transform.InverseTransformPoint(movedPoint) - splineStart);
                     if (mustCreateNewNode) {
                         // We must create a new node
                         mustCreateNewNode = false;
                         Vertex newVertex = new Vertex(newVertexPoint, v.normal, v.uCoord);
-                        int i = se.ShapeVertices.IndexOf(v);
-                        if(i == se.ShapeVertices.Count - 1) {
-                            se.ShapeVertices.Add(newVertex);
+                        int i = extruder.ShapeVertices.IndexOf(v);
+                        if(i == extruder.ShapeVertices.Count - 1) {
+                            extruder.ShapeVertices.Add(newVertex);
                         } else {
-                            se.ShapeVertices.Insert(i + 1, newVertex);
+                            extruder.ShapeVertices.Insert(i + 1, newVertex);
                         }
                         selection = newVertex;
                     } else {
                         v.point = newVertexPoint;
                         // normal must be updated if point has been moved
-                        normal = se.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
+                        normal = extruder.transform.TransformPoint(q * (v.point + v.normal) + splineStart);
                     }
-                    se.Generate();
+                    extruder.Generate();
                 } else {
                     // vertex position handle hasn't been moved
                     // create a handle for normal
                     Vector3 movedNormal = Handles.Slider2D(normal, splineStartTangent, Vector3.right, Vector3.up, size, Handles.CircleHandleCap, snap);
                     if(movedNormal != normal) {
                         // normal has been moved
-                        v.normal = (Vector2)(Quaternion.Inverse(q) * (se.transform.InverseTransformPoint(movedNormal) - splineStart)) - v.point;
-                        se.Generate();
+                        v.normal = (Vector2)(Quaternion.Inverse(q) * (extruder.transform.InverseTransformPoint(movedNormal) - splineStart)) - v.point;
+                        extruder.Generate();
                     }
                 }
 
@@ -100,12 +100,13 @@ public class ExtruderEditor : Editor
             Handles.DrawLine(point, normal);
 
             // draw a line between that vertex and the next one
-            int index = se.ShapeVertices.IndexOf(v);
-            int nextIndex = index == se.ShapeVertices.Count - 1 ? 0 : index + 1;
-            Vertex next = se.ShapeVertices[nextIndex];
+            int index = extruder.ShapeVertices.IndexOf(v);
+            int nextIndex = index == extruder.ShapeVertices.Count - 1 ? 0 : index + 1;
+            Vertex next = extruder.ShapeVertices[nextIndex];
             Handles.color = CURVE_COLOR;
-            Vector3 vAtSplineEnd = se.transform.TransformPoint(q * next.point + splineStart);
+            Vector3 vAtSplineEnd = extruder.transform.TransformPoint(q * next.point + splineStart);
             Handles.DrawLine(point, vAtSplineEnd);
+
         }
     }
 
@@ -127,14 +128,14 @@ public class ExtruderEditor : Editor
         EditorGUILayout.HelpBox("Hold Alt and drag a vertex to create a new one.", MessageType.Info);
 
         // Delete vertex button
-        if (selection == null || se.ShapeVertices.Count <= 3) {
+        if (selection == null || extruder.ShapeVertices.Count <= 3) {
             GUI.enabled = false;
         }
         if (GUILayout.Button("Delete selected vertex")) {
-            Undo.RegisterCompleteObjectUndo(se, "delete vertex");
-            se.ShapeVertices.Remove(selection);
+            Undo.RegisterCompleteObjectUndo(extruder, "delete vertex");
+            extruder.ShapeVertices.Remove(selection);
             selection = null;
-            se.Generate();
+            extruder.Generate();
         }
         GUI.enabled = true;
 

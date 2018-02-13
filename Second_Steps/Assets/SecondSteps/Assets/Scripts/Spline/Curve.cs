@@ -202,7 +202,7 @@ public class Curve
     }
 
     /// <summary>
-    /// Convenient method that returns a quaternion used rotate an object in the tangent direction, considering Y-axis as up vector.
+    /// Convenient method that returns a quaternion used to rotate an object in the tangent direction, considering Y-axis as up vector.
     /// </summary>
     /// <param name="Tangent"></param>
     /// <returns></returns>
