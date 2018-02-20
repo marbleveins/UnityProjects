@@ -432,14 +432,14 @@ Mesh:
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
-    indexCount: 0
+    indexCount: 108
     topology: 0
     baseVertex: 0
     firstVertex: 0
-    vertexCount: 0
+    vertexCount: 20
     localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
+      m_Center: {x: 6.7900004, y: 0.25, z: -0.4982729}
+      m_Extent: {x: 7.7900004, y: 0.25, z: 3.378273}
   m_Shapes:
     vertices: []
     shapes: []
@@ -453,14 +453,18 @@ Mesh:
   m_KeepVertices: 1
   m_KeepIndices: 1
   m_IndexFormat: 0
-  m_IndexBuffer: 
+  m_IndexBuffer: 010000000200020003000100000001000300030002000000030002000400040005000300020003000500050004000200050004000600060007000500040005000700070006000400070006000800080009000700060007000900090008000600090008000a000a000b000900080009000b000b000a0008000b000a000c000c000d000b000a000b000d000d000c000a000d000c000e000e000f000d000c000d000f000f000e000c000f000e001000100011000f000e000f001100110010000e00110010001200120013001100100011001300130012001000
   m_Skin: []
   m_VertexData:
-    m_CurrentChannels: 1
-    m_VertexCount: 0
+    m_CurrentChannels: 11
+    m_VertexCount: 20
     m_Channels:
     - stream: 0
       offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 12
       format: 0
       dimension: 3
     - stream: 0
@@ -468,9 +472,9 @@ Mesh:
       format: 0
       dimension: 0
     - stream: 0
-      offset: 0
+      offset: 24
       format: 0
-      dimension: 0
+      dimension: 2
     - stream: 0
       offset: 0
       format: 0
@@ -487,12 +491,8 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 0
-    _typelessdata: 
+    m_DataSize: 640
+    _typelessdata: 00000000000000000000000000000000000080bf000000000000000000000000000080bf0000003f00000000000080bf000080bf00000000c3f5a83e000000003e0ad73e00000000703d0ac000000000000080bf0000008000000000cdcccc3d5284e2be0000003f08a32ac048c75cbf000080bf5f9601bfc3f5a83ecdcccc3d15aec73f00000000ec5138c000000000000080bf0000008000000000cdcc4c3ed80cbd3f0000003f541978c0d013aabd000080bf9f1d7fbfc3f5a83ecdcc4c3e295c4f4000000000af4721c000000000000080bf00000000000000009a99993e74c667400000003fa0705cc05a52c33e000080bfc5a36cbfc3f5a83e9a99993ec3f5a84000000000f051b8bf00000000000080bf0000000000000000cdcccc3e7ba5b9400000003f24c512c0c07d053f000080bfae705abfc3f5a83ecdcccc3e0000f040000000000000000000000000000080bf00000000000000000000003f0de000410000003f410155bfd4000e3f000080bf410155bfc3f5a83e0000003f1f851b4100000000ee51b83f00000000000080bf00000000000000009a99193ffbdc23410000003f2e33163fc07d053f000080bfae705abfc3f5a83e9a99193ff7283c4100000000b047214000000000000080bf00000000000000003333333f8a4342410000003f7d3dcc3f5652c33e000080bfc6a36cbfc3f5a83e3333333f3f0a574100000000ec51384000000000000080bf0000008000000000cdcc4c3f17b655410000003f0815f13f0014aabd000080bfa01d7fbfc3f5a83ecdcc4c3faf476941000000006b3d0a4000000000000080bf00000080000000006666663f3a7b5b410000003faeafd33f50c75cbf000080bf4f9601bfc3f5a83e6666663f
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -546,8 +546,8 @@ Mesh:
       m_BitSize: 0
     m_UVInfo: 0
   m_LocalAABB:
-    m_Center: {x: 7.1868124, y: 1.25, z: 0}
-    m_Extent: {x: 8.686812, y: 1.25, z: 4.374819}
+    m_Center: {x: 6.7900004, y: 0.25, z: -0.4982729}
+    m_Extent: {x: 7.7900004, y: 0.25, z: 3.378273}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -597,8 +597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74468b44070c6c4fb84057e9b0238cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spline: {fileID: 1318805668}
-  ShapeVertices: []
+  spline: {fileID: 0}
 --- !u!4 &1318805670
 Transform:
   m_ObjectHideFlags: 0
@@ -670,24 +669,24 @@ MonoBehaviour:
   - point: {x: 0, y: 0}
     normal: {x: 0, y: -1}
     uCoord: 0
-  - point: {x: 1, y: 0.5}
-    normal: {x: 1, y: -1}
-    uCoord: 0
-  - point: {x: 1.5, y: 1.5}
-    normal: {x: 1, y: 0}
-    uCoord: 0
+  - point: {x: -1, y: 0.5}
+    normal: {x: -1, y: -1}
+    uCoord: 0.66
+  - point: {x: -1.5, y: 1.5}
+    normal: {x: -1, y: 0}
+    uCoord: 0.33
+  - point: {x: -1, y: 2.5}
+    normal: {x: -1, y: 1.5}
+    uCoord: 0.33
   - point: {x: 1, y: 2.5}
     normal: {x: 1, y: 1.5}
     uCoord: 0
-  - point: {x: -1, y: 2.5}
-    normal: {x: -1, y: 1.5}
-    uCoord: 0
-  - point: {x: -1.5, y: 1.5}
-    normal: {x: -1, y: 0}
-    uCoord: 0
-  - point: {x: -1, y: 0.5}
-    normal: {x: -1, y: -1}
-    uCoord: 0
+  - point: {x: 1.5, y: 1.5}
+    normal: {x: 1, y: 0}
+    uCoord: 0.66
+  - point: {x: 1, y: 0.5}
+    normal: {x: 1, y: -1}
+    uCoord: 0.33
 --- !u!1 &1365005730
 GameObject:
   m_ObjectHideFlags: 0

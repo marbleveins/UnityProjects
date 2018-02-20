@@ -73,8 +73,9 @@ public class NewSpline : MonoBehaviour
     public List<OrientedPoint> GetPath()
     {
         var path = new List<OrientedPoint>();
-        for (float t = 0; t < curves.Count; t += 1 / 10.0f)
+        for (float t = 0; t < curves.Count; t += 1 / (float)breaks)
         {
+            Debug.Log(string.Format("t: {0} ", t));
             var point = GetPositionAtTime(t);
             var rotation = Curve.GetRotationFromTangent(GetOrientationAtTime(t));
             path.Add(new OrientedPoint(point, rotation));
@@ -95,7 +96,7 @@ public class NewSpline : MonoBehaviour
     {
         if (t < 0 || t > curves.Count)
         {
-            throw new ArgumentException(string.Format("Time must be between 0 and last node index ({0}). Given time was {1}.", points.Count - 1, t));
+            throw new ArgumentException(string.Format("Time must be between 0 and last node index ({0}). Given time was {1}.", curves.Count + 1, t));
         }
         int index = Mathf.FloorToInt(t);
         if (index == curves.Count)

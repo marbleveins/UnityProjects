@@ -8,7 +8,7 @@ public class Path : MonoBehaviour {
     [SerializeField]
     private NewSpline spline;
     private Extruder extruder;
-    public List<Vertex> ShapeVertices = new List<Vertex>();
+    private List<Vertex> ShapeVertices = new List<Vertex>();
     public Shape shape;
 
     private MeshFilter mf;
@@ -52,15 +52,17 @@ public class Path : MonoBehaviour {
     {
         ShapeVertices.Clear();
 
+        
         ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
 
-        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
-
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
         ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
+
+        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
+        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
+
 
     }
     public void GetNewPath()

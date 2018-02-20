@@ -23,15 +23,17 @@ public class Extruder : MonoBehaviour
     {
         ShapeVertices.Clear();
 
+
         ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
 
-        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
-
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
         ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
+        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
+
+        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
+        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
+        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
+
 
         toUpdate = true;
         OnEnable();
@@ -58,7 +60,7 @@ public class Extruder : MonoBehaviour
     {
         if (toUpdate)
         {
-            Generate();
+            //Generate();
             toUpdate = false;
         }
     }
@@ -66,26 +68,52 @@ public class Extruder : MonoBehaviour
     public void Generate()
     {
         List<OrientedPoint> path = spline.GetPath();
-        Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
-        int[] triangleIndices = GenerateTriangles(path.Count, shape.verticesCount);
+        if (path.Count == 0) return;
+        //Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
+        int[] triangleIndices = GenerateTriangles(path.Count-1, ShapeVertices.Count);
+        
 
-        SetMesh(shape, triangleIndices);
+
+
+        int edgeLoops = path.Count;//por legibilidad. borrar una vez que se entienda
+        int allVertices = ShapeVertices.Count * path.Count;
+        Vector3[] vertices = new Vector3[allVertices];
+        Vector3[] normals = new Vector3[allVertices];
+        Vector2[] uvs = new Vector2[allVertices];
+
+
+
+        int index = 0;
+        foreach (OrientedPoint op in path)
+        {
+            foreach (Vertex v in ShapeVertices)
+            {
+                vertices[index] = op.LocalToWorld(v.point);
+                normals[index] = op.LocalToWorldDirection(v.normal);
+                uvs[index] = new Vector2(v.uCoord, path.IndexOf(op) / ((float)edgeLoops) * TextureScale);
+                
+                index++;
+            }
+        }
+        
+
+        SetMesh(vertices, normals, uvs, triangleIndices);
     }
 
-    public void SetMesh(Shape shape, int[] triangleIndices)
+    public void SetMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangleIndices)
     {
         mf.sharedMesh.Clear();
-        mf.sharedMesh.vertices = shape.vertices;
-        mf.sharedMesh.normals = shape.normals;
-        mf.sharedMesh.uv = shape.uvs;
+        mf.sharedMesh.vertices = vertices;
+        mf.sharedMesh.normals = normals;
+        mf.sharedMesh.uv = uvs;
         mf.sharedMesh.triangles = triangleIndices;
     }
 
     private int[] GenerateTriangles(int segments, int shapeVertices)
     {
-
         int index = 0;
         int trianglesAmount = shapeVertices * 2 * segments;
+        //Debug.Log(string.Format("GenerateTriangles=  segments:  {0}, shapeVertices:  {1}, trianglesAmount:  {2}", segments, shapeVertices, trianglesAmount));
         int[] triangleIndices = new int[trianglesAmount * 3];
 
         for (int i = 0; i < segments; i++)
@@ -101,6 +129,7 @@ public class Extruder : MonoBehaviour
                 triangleIndices[index * 6 + 0] = c;
                 triangleIndices[index * 6 + 1] = b;
                 triangleIndices[index * 6 + 2] = a;
+
                 triangleIndices[index * 6 + 3] = a;
                 triangleIndices[index * 6 + 4] = d;
                 triangleIndices[index * 6 + 5] = c;
