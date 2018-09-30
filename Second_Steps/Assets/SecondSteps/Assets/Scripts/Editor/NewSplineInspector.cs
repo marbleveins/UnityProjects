@@ -134,16 +134,15 @@ public class NewSplineInspector : Editor
     {
         if (splineMono.Points.Count > 0)
         {
-            var splineHelper = new SplineHelper();
             Handles.color = Color.green;
 
-            Vector3 point = splineHelper.GetPositionAtTime(splineMono.spline, 0f);
-            Handles.DrawLine(point, point + splineHelper.GetOrientationAtTime(splineMono.spline, 0f) * directionScale);
+            Vector3 point = splineMono.GetPositionAtTime( 0f);
+            Handles.DrawLine(point, point + splineMono.GetOrientationAtTime(0f) * directionScale);
             int steps = splineMono.Breaks * splineMono.Curves.Count;
             for (float t = 0; t <= splineMono.Curves.Count; t += 1 / (float)splineMono.Breaks)
             {
-                point = splineHelper.GetPositionAtTime(splineMono.spline, t);
-                Handles.DrawLine(point, point + splineHelper.GetOrientationAtTime(splineMono.spline, t) * directionScale);
+                point = splineMono.GetPositionAtTime(t);
+                Handles.DrawLine(point, point + splineMono.GetOrientationAtTime( t) * directionScale);
             }
             /*for (int i = 1; i <= steps; i++)
             {

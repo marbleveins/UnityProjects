@@ -299,7 +299,6 @@
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\SplineMono.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\Node.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\SplineClass.cs" />
-    <Compile Include="Assets\SecondSteps\Assets\Scripts\Spline\SplineHelper.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Bezier\CubicBezierCurve.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Bezier\MeshBender.cs" />
     <Compile Include="Assets\SplineMesh\Scripts\Bezier\Spline.cs" />

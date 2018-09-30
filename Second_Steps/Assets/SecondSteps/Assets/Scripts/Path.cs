@@ -42,8 +42,7 @@ public class Path : MonoBehaviour {
 
     private void StartNewDefaultSpline()
     {
-        var splineHelper = new SplineHelper();
-        splineClass = splineHelper.MakeNewDefaultSpline(SplineMono.InitialPosition);
+        splineClass = SplineMono.MakeNewDefaultSpline();
     }
 
     private Shape GetFirstShape()
