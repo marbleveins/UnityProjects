@@ -22,7 +22,7 @@ public class ExtruderEditor : Editor
 
     void OnSceneGUI()
     {
-        if (extruder.spline == null || extruder.spline.spline == null) return;
+        if (!extruder.spline.Started()) return;
 
         Event e = Event.current;
         if (e.type == EventType.MouseDown) {

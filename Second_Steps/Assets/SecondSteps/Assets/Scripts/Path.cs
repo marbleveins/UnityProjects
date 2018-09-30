@@ -8,7 +8,6 @@ public class Path : MonoBehaviour {
 
     [SerializeField]
     private SplineMono SplineMono { get; set; }
-    private SplineClass splineClass;
 
     private Extruder extruder;
     private List<Vertex> ShapeVertices = new List<Vertex>();
@@ -24,9 +23,7 @@ public class Path : MonoBehaviour {
     private void Start()
     {
 
-        SplineMono = GetComponent<SplineMono>();
-        StartNewDefaultSpline();
-        SplineMono.SetSpline(splineClass);
+        StartSpline();
         extruder = GetComponent<Extruder>();
 
         mf = GetComponent<MeshFilter>();
@@ -40,9 +37,10 @@ public class Path : MonoBehaviour {
         extruder.Generate();
     }
 
-    private void StartNewDefaultSpline()
+    private void StartSpline()
     {
-        splineClass = SplineMono.MakeNewDefaultSpline();
+        SplineMono = GetComponent<SplineMono>();
+        SplineMono.AddFollowingDefaultCurve();
     }
 
     private Shape GetFirstShape()
