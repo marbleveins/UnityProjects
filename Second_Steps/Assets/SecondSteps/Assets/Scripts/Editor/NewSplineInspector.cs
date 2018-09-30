@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-[CustomEditor(typeof(NewSpline))]
+[CustomEditor(typeof(SplineMono))]
 public class NewSplineInspector : Editor
 {
 
@@ -15,23 +15,23 @@ public class NewSplineInspector : Editor
     private const float directionScale = 1.5f;
 
 
-    private NewSpline spline;
+    private SplineMono splineMono;
     
     private Node selectedNode;
     
     public override void OnInspectorGUI()
     {//movimiento de los inspector en la ventana Scene 
 
-        spline = target as NewSpline;
+        splineMono = target as SplineMono;
         if (selectedNode != null)
         {
             //DrawSelectedPointInspector();
         }
         if (GUILayout.Button("Add Curve"))
         {
-            Undo.RegisterCompleteObjectUndo(spline, "Add Curve");
-            spline.AddDefaultCurve();
-            EditorUtility.SetDirty(spline);
+            Undo.RegisterCompleteObjectUndo(splineMono, "Add Curve");
+            splineMono.AddFollowingDefaultCurve();
+            EditorUtility.SetDirty(splineMono);
         }
     }
 
@@ -39,11 +39,11 @@ public class NewSplineInspector : Editor
     private void OnSceneGUI()
     {//movimiento del mouse en la ventana Scene 
 
-        spline = target as NewSpline;
+        splineMono = target as SplineMono;
 
-        if (spline.points.Count > 0)
+        if (splineMono.Points != null && splineMono.Points.Count > 0)
         {
-            handleTransform = spline.transform;
+            handleTransform = splineMono.transform;
             handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
             DrawHandles();
@@ -53,16 +53,16 @@ public class NewSplineInspector : Editor
         }
         else
         {
-            StartNewSpline();
+           //StartNewSpline();
         }
 
     }
 
     private void StartNewSpline()
     {
-        spline.points.Clear();
-        spline.curves.Clear();
-        spline.AddDefaultCurve();
+        splineMono.Points.Clear();
+        splineMono.Curves.Clear();
+        splineMono.AddFollowingDefaultCurve();
 
     }
 
@@ -86,7 +86,7 @@ public class NewSplineInspector : Editor
     private void DrawHandles()
     {
         Handles.color = Color.white;
-        foreach (Node node in spline.points)
+        foreach (Node node in splineMono.Points)
         {
             float size = HandleUtility.GetHandleSize(node.position);
             if (Handles.Button(node.position, handleRotation, size * handleSize, size * pickSize, Handles.DotHandleCap))
@@ -104,8 +104,8 @@ public class NewSplineInspector : Editor
             Vector3 updatedPosition = Handles.DoPositionHandle(node.position, handleRotation);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RegisterCompleteObjectUndo(spline, "Move Point");
-                EditorUtility.SetDirty(spline);
+                Undo.RegisterCompleteObjectUndo(splineMono, "Move Point");
+                EditorUtility.SetDirty(splineMono);
                 //node.position = handleTransform.InverseTransformPoint(updatedPosition);
                 node.position = updatedPosition;
             }
@@ -116,7 +116,7 @@ public class NewSplineInspector : Editor
     private void DrawCurves()
     {
         Handles.color = Color.grey;
-        foreach (Curve curve in spline.curves)
+        foreach (Curve curve in splineMono.Curves)
         {
             Handles.DrawBezier(curve.nodoInicio.position,
                 curve.nodoFin.position,
@@ -132,17 +132,18 @@ public class NewSplineInspector : Editor
 
     private void DrawDirections()
     {
-        if (spline.points.Count > 0)
+        if (splineMono.Points.Count > 0)
         {
+            var splineHelper = new SplineHelper();
             Handles.color = Color.green;
 
-            Vector3 point = spline.GetPositionAtTime(0f);
-            Handles.DrawLine(point, point + spline.GetOrientationAtTime(0f) * directionScale);
-            int steps = spline.breaks * spline.curves.Count;
-            for (float t = 0; t <= spline.curves.Count; t += 1 / (float)spline.breaks)
+            Vector3 point = splineHelper.GetPositionAtTime(splineMono.spline, 0f);
+            Handles.DrawLine(point, point + splineHelper.GetOrientationAtTime(splineMono.spline, 0f) * directionScale);
+            int steps = splineMono.Breaks * splineMono.Curves.Count;
+            for (float t = 0; t <= splineMono.Curves.Count; t += 1 / (float)splineMono.Breaks)
             {
-                point = spline.GetPositionAtTime(t);
-                Handles.DrawLine(point, point + spline.GetOrientationAtTime(t) * directionScale);
+                point = splineHelper.GetPositionAtTime(splineMono.spline, t);
+                Handles.DrawLine(point, point + splineHelper.GetOrientationAtTime(splineMono.spline, t) * directionScale);
             }
             /*for (int i = 1; i <= steps; i++)
             {

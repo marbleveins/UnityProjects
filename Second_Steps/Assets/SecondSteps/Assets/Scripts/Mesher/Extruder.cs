@@ -7,13 +7,13 @@ using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(NewSpline))]
+[RequireComponent(typeof(SplineMono))]
 public class Extruder : MonoBehaviour
 {
 
     private MeshFilter mf;
 
-    public NewSpline spline;
+    public SplineMono spline;
     public float TextureScale = 1;
     public List<Vertex> ShapeVertices = new List<Vertex>();
 
@@ -47,7 +47,7 @@ public class Extruder : MonoBehaviour
     private void OnEnable()
     {
         mf = GetComponent<MeshFilter>();
-        spline = GetComponent<NewSpline>();
+        spline = GetComponent<SplineMono>();
         if (mf.sharedMesh == null)
         {
             mf.sharedMesh = new Mesh();
@@ -67,7 +67,7 @@ public class Extruder : MonoBehaviour
 
     public void Generate()
     {
-        List<OrientedPoint> path = spline.GetPath();
+        List<OrientedPoint> path = spline.GetPath2();
         if (path.Count == 0) return;
         //Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
         int[] triangleIndices = GenerateTriangles(path.Count-1, ShapeVertices.Count);

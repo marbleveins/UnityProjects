@@ -5,8 +5,11 @@ using UnityEngine;
 public class Path : MonoBehaviour {
     //usa el mesher y el spline
 
+
     [SerializeField]
-    private NewSpline spline;
+    private SplineMono SplineMono { get; set; }
+    private SplineClass splineClass;
+
     private Extruder extruder;
     private List<Vertex> ShapeVertices = new List<Vertex>();
     public Shape shape;
@@ -20,9 +23,11 @@ public class Path : MonoBehaviour {
 
     private void Start()
     {
-        spline = GetComponent<NewSpline>();
+
+        SplineMono = GetComponent<SplineMono>();
+        StartNewDefaultSpline();
+        SplineMono.SetSpline(splineClass);
         extruder = GetComponent<Extruder>();
-        StartNewSpline();
 
         mf = GetComponent<MeshFilter>();
         if (mf != null && mf.sharedMesh == null)
@@ -35,11 +40,10 @@ public class Path : MonoBehaviour {
         extruder.Generate();
     }
 
-    private void StartNewSpline()
+    private void StartNewDefaultSpline()
     {
-        spline.points.Clear();
-        spline.curves.Clear();
-        spline.AddDefaultCurve();
+        var splineHelper = new SplineHelper();
+        splineClass = splineHelper.MakeNewDefaultSpline(SplineMono.InitialPosition);
     }
 
     private Shape GetFirstShape()
@@ -65,8 +69,9 @@ public class Path : MonoBehaviour {
 
 
     }
-    public void GetNewPath()
-    {
 
+    public void SetSpline(SplineMono newSpline)
+    {
+        this.SplineMono = newSpline;
     }
 }

@@ -13,15 +13,19 @@ public class ExtruderEditor : Editor
 
     private Extruder extruder;
     private Vertex selection = null;
+    private SplineHelper splineHelper;
 
     private void OnEnable() {
         extruder = (Extruder)target;
         textureScale = serializedObject.FindProperty("TextureScale");
         vertices = serializedObject.FindProperty("ShapeVertices");
+        splineHelper = new SplineHelper();
     }
 
     void OnSceneGUI()
     {
+        if (extruder.spline == null || extruder.spline.spline == null) return;
+
         Event e = Event.current;
         if (e.type == EventType.MouseDown) {
             Undo.RegisterCompleteObjectUndo(extruder, "change extruded shape");
@@ -34,8 +38,8 @@ public class ExtruderEditor : Editor
             mustCreateNewNode = false;
         }
 
-        Vector3 splineStartTangent = extruder.spline.GetOrientationAtTime(0);
-        Vector3 splineStart = extruder.spline.GetPositionAtTime(0);
+        Vector3 splineStartTangent = splineHelper.GetOrientationAtTime( extruder.spline.spline, 0);
+        Vector3 splineStart = splineHelper.GetPositionAtTime( extruder.spline.spline, 0);
         Quaternion q = CubicBezierCurve.GetRotationFromTangent(splineStartTangent);
 
         foreach (Vertex v in extruder.ShapeVertices) {
