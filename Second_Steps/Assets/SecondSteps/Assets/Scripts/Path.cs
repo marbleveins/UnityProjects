@@ -41,6 +41,9 @@ public class Path : MonoBehaviour {
     {
         SplineMono = GetComponent<SplineMono>();
         SplineMono.AddFollowingDefaultCurve();
+        SplineMono.AddFollowingDefaultCurve();
+        SplineMono.AddFollowingDefaultCurve();
+        SplineMono.AddFollowingDefaultCurve();
     }
 
     private Shape GetFirstShape()
@@ -65,10 +68,5 @@ public class Path : MonoBehaviour {
         ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
 
 
-    }
-
-    public void SetSpline(SplineMono newSpline)
-    {
-        this.SplineMono = newSpline;
     }
 }

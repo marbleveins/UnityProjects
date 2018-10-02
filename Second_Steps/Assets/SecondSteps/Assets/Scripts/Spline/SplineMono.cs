@@ -12,8 +12,13 @@ public class SplineMono : MonoBehaviour
 
     public int Breaks = 10;
     public bool breaksFixedOnlyTrue = true;
+
     public bool relativePosition = true;
     
+    private void Start()
+    {
+    }
+
     public Vector3 InitialPosition
     {
         get
@@ -34,6 +39,7 @@ public class SplineMono : MonoBehaviour
         {
             return (this.Points != null && this.Points.Count > 0);
         }
+
         public void AddCurve(Curve cu)
         {
             Points.Add(cu.nodoInicio);
@@ -41,13 +47,14 @@ public class SplineMono : MonoBehaviour
             Points.Add(cu.c2);
             Points.Add(cu.nodoFin);
             Curves.Add(cu);
+
         }
 
         public void AddFollowingDefaultCurve()
         {
             if (!Started())
             {
-                AddCurve(GetANewFirstCurve(InitialPosition));
+                AddCurve(GetANewFirstCurve());
             }
             else
             {
@@ -72,7 +79,7 @@ public class SplineMono : MonoBehaviour
             var path = new List<OrientedPoint>();
             for (float t = 0; t < Curves.Count; t += 1 / (float)Breaks)
             {
-                Debug.Log(string.Format("t: {0} ", t));
+                //Debug.Log(string.Format("t: {0} ", t));
                 var point = GetPositionAtTime(t);
                 var rotation = Curve.GetRotationFromTangent(GetOrientationAtTime(t));
                 path.Add(new OrientedPoint(point, rotation));
@@ -86,7 +93,7 @@ public class SplineMono : MonoBehaviour
             for (float i = 0; i <= Curves.Count * Breaks; i += 1)
             {
                 t = i / Breaks;
-                Debug.Log(string.Format("t: {0} ", t));
+                //Debug.Log(string.Format("t: {0} ", t));
                 var point = GetPositionAtTime(t);
                 var rotation = Curve.GetRotationFromTangent(GetOrientationAtTime(t));
                 path.Add(new OrientedPoint(point, rotation));
@@ -98,12 +105,11 @@ public class SplineMono : MonoBehaviour
     
     #region Private Methods
 
-    private Curve GetANewFirstCurve(Vector3 startingPosition)
+    private Curve GetANewFirstCurve()
         {
-
             Node inicio, fin, c1, c2;
             Vector3 c1pos, c1dir, c2pos, c2dir;
-            inicio = new Node(startingPosition, Vector3.back);
+            inicio = new Node(InitialPosition, Vector3.back);
 
             fin = new Node(inicio.position + (Vector3.right * 15), Vector3.back);
 

@@ -100,7 +100,7 @@ public class Extruder : MonoBehaviour
         SetMesh(vertices, normals, uvs, triangleIndices);
     }
 
-    public void SetMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangleIndices)
+    private void SetMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangleIndices)
     {
         mf.sharedMesh.Clear();
         mf.sharedMesh.vertices = vertices;

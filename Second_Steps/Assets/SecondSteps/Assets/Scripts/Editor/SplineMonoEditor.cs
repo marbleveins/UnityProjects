@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [CustomEditor(typeof(SplineMono))]
-public class NewSplineInspector : Editor
+public class SplineMonoEditor : Editor
 {
 
     private Quaternion handleRotation;
@@ -18,9 +18,13 @@ public class NewSplineInspector : Editor
     private SplineMono splineMono;
     
     private Node selectedNode;
-    
+
+    private void OnEnable()
+    {
+
+    }
     public override void OnInspectorGUI()
-    {//movimiento de los inspector en la ventana Scene 
+    {//movimiento de los inspector(xyz) en la ventana Scene, seleccion de un GO y mouseOver los Inspector
 
         splineMono = target as SplineMono;
         if (selectedNode != null)
@@ -41,7 +45,7 @@ public class NewSplineInspector : Editor
 
         splineMono = target as SplineMono;
 
-        if (splineMono.Points != null && splineMono.Points.Count > 0)
+        if (splineMono.Started())
         {
             handleTransform = splineMono.transform;
             handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
@@ -49,21 +53,21 @@ public class NewSplineInspector : Editor
             DrawHandles();
             CheckNodeMovement(selectedNode);
             DrawCurves();
-            DrawDirections();
+            //DrawDirections();
         }
         else
         {
-           //StartNewSpline();
+            StartNewSpline();
         }
 
     }
 
     private void StartNewSpline()
     {
-        splineMono.Points.Clear();
-        splineMono.Curves.Clear();
         splineMono.AddFollowingDefaultCurve();
-
+        splineMono.AddFollowingDefaultCurve();
+        splineMono.AddFollowingDefaultCurve();
+        splineMono.AddFollowingDefaultCurve();
     }
 
 
@@ -132,7 +136,7 @@ public class NewSplineInspector : Editor
 
     private void DrawDirections()
     {
-        if (splineMono.Points.Count > 0)
+        if (splineMono.Started())
         {
             Handles.color = Color.green;
 
