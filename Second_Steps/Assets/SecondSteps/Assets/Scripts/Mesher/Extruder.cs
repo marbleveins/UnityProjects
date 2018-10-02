@@ -13,30 +13,25 @@ public class Extruder : MonoBehaviour
 
     private MeshFilter mf;
 
+    public Shape2D shape2d;
     public SplineMono spline;
     public float TextureScale = 1;
-    public List<Vertex> ShapeVertices = new List<Vertex>();
 
     private bool toUpdate = true;
 
     private void Reset()
-    {
-        ShapeVertices.Clear();
-
-
-        ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
-
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
-
-        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
-        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
-
+    {   //Reset is called when the user hits the Reset button in the Inspector's context menu or 
+        //when adding the component the first time. This function is only called in editor mode. 
+        //Reset is most commonly used to give good default values in the inspector.
+        
 
         toUpdate = true;
         OnEnable();
+    }
+
+    private void Start()
+    {
+        shape2d = new Shape2D();
     }
 
     private void OnValidate()
@@ -46,8 +41,8 @@ public class Extruder : MonoBehaviour
 
     private void OnEnable()
     {
-        mf = GetComponent<MeshFilter>();
         spline = GetComponent<SplineMono>();
+        mf = GetComponent<MeshFilter>();
         if (mf.sharedMesh == null)
         {
             mf.sharedMesh = new Mesh();
@@ -65,18 +60,23 @@ public class Extruder : MonoBehaviour
         }
     }
 
+    public bool Shaped()
+    {
+        return (shape2d != null && shape2d.Vertices != null && shape2d.Vertices.Count > 0);
+    }
+
     public void Generate()
     {
         List<OrientedPoint> path = spline.GetPath2();
         if (path.Count == 0) return;
         //Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
-        int[] triangleIndices = GenerateTriangles(path.Count-1, ShapeVertices.Count);
+        int[] triangleIndices = GenerateTriangles(path.Count-1, shape2d.Vertices.Count);
         
 
 
 
         int edgeLoops = path.Count;//por legibilidad. borrar una vez que se entienda
-        int allVertices = ShapeVertices.Count * path.Count;
+        int allVertices = shape2d.Vertices.Count * path.Count;
         Vector3[] vertices = new Vector3[allVertices];
         Vector3[] normals = new Vector3[allVertices];
         Vector2[] uvs = new Vector2[allVertices];
@@ -86,7 +86,7 @@ public class Extruder : MonoBehaviour
         int index = 0;
         foreach (OrientedPoint op in path)
         {
-            foreach (Vertex v in ShapeVertices)
+            foreach (Vertex v in shape2d.Vertices)
             {
                 vertices[index] = op.LocalToWorld(v.point);
                 normals[index] = op.LocalToWorldDirection(v.normal);
@@ -109,22 +109,22 @@ public class Extruder : MonoBehaviour
         mf.sharedMesh.triangles = triangleIndices;
     }
 
-    private int[] GenerateTriangles(int segments, int shapeVertices)
+    private int[] GenerateTriangles(int segments, int shapeVertexCount)
     {
         int index = 0;
-        int trianglesAmount = shapeVertices * 2 * segments;
+        int trianglesAmount = shapeVertexCount * 2 * segments;
         //Debug.Log(string.Format("GenerateTriangles=  segments:  {0}, shapeVertices:  {1}, trianglesAmount:  {2}", segments, shapeVertices, trianglesAmount));
         int[] triangleIndices = new int[trianglesAmount * 3];
 
         for (int i = 0; i < segments; i++)
         {
-            for (int j = 0; j < shapeVertices; j++)
+            for (int j = 0; j < shapeVertexCount; j++)
             {
-                int offset = j == shapeVertices - 1 ? -(shapeVertices - 1) : 1;
-                int a = index + shapeVertices;
+                int offset = j == shapeVertexCount - 1 ? -(shapeVertexCount - 1) : 1;
+                int a = index + shapeVertexCount;
                 int b = index;
                 int c = index + offset;
-                int d = index + offset + shapeVertices;
+                int d = index + offset + shapeVertexCount;
 
                 triangleIndices[index * 6 + 0] = c;
                 triangleIndices[index * 6 + 1] = b;

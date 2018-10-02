@@ -8,10 +8,8 @@ public class Path : MonoBehaviour {
 
     [SerializeField]
     private SplineMono SplineMono { get; set; }
-
+    
     private Extruder extruder;
-    private List<Vertex> ShapeVertices = new List<Vertex>();
-    public Shape shape;
 
     private MeshFilter mf;
 
@@ -22,18 +20,10 @@ public class Path : MonoBehaviour {
 
     private void Start()
     {
-
         StartSpline();
-        extruder = GetComponent<Extruder>();
-
-        mf = GetComponent<MeshFilter>();
-        if (mf != null && mf.sharedMesh == null)
-        {
-            mf.sharedMesh = new Mesh();
-        }
-
-        FormShapeVertices();
-        shape = GetFirstShape();
+        StartExtruder();
+        StartMesh();
+        
         extruder.Generate();
     }
 
@@ -46,27 +36,21 @@ public class Path : MonoBehaviour {
         SplineMono.AddFollowingDefaultCurve();
     }
 
-    private Shape GetFirstShape()
+    private void StartExtruder()
     {
-        Shape shape = new Shape(7);
-        return shape;
+        extruder = GetComponent<Extruder>();
+        extruder.shape2d = new Shape2D
+        {
+            Vertices = CommonHelperForNow.GetDefaultShapeVertices()
+        };
     }
 
-    private void FormShapeVertices()
+    private void StartMesh()
     {
-        ShapeVertices.Clear();
-
-        
-        ShapeVertices.Add(new Vertex(new Vector2(0, 0f), new Vector2(0, -1), 0));
-
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 0.5f), new Vector2(-1, -1), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1.5f, 1.5f), new Vector2(-1, 0), 0.33f));
-        ShapeVertices.Add(new Vertex(new Vector2(-1, 2.5f), new Vector2(-1, 1.5f), 0.33f));
-
-        ShapeVertices.Add(new Vertex(new Vector2(1, 2.5f), new Vector2(1, 1.5f), 0));
-        ShapeVertices.Add(new Vertex(new Vector2(1.5f, 1.5f), new Vector2(1, 0), 0.66f));
-        ShapeVertices.Add(new Vertex(new Vector2(1, 0.5f), new Vector2(1, -1), 0.33f));
-
-
+        mf = GetComponent<MeshFilter>();
+        if (mf != null && mf.sharedMesh == null)
+        {
+            mf.sharedMesh = new Mesh();
+        }
     }
 }

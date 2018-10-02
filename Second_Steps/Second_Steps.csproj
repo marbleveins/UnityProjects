@@ -286,6 +286,7 @@
   <ItemGroup>
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Bezier\Bezier.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Bezier\ControlPointMode.cs" />
+    <Compile Include="Assets\SecondSteps\Assets\Scripts\Common\CommonHelperForNow.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Common\OrientedPoint.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Common\Vertex.cs" />
     <Compile Include="Assets\SecondSteps\Assets\Scripts\Mesher\Extruder.cs" />
