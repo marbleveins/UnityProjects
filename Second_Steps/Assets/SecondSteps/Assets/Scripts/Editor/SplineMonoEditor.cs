@@ -54,6 +54,7 @@ public class SplineMonoEditor : Editor
             CheckNodeMovement(selectedNode);
             DrawCurves();
             //DrawDirections();
+            DrawUpwards();
         }
         else
         {
@@ -155,6 +156,18 @@ public class SplineMonoEditor : Editor
             }*/
 
         }
+    }
+
+    private void DrawUpwards()
+    {
+        if (!splineMono.Started()) return;
+
+        Handles.color = Color.yellow;
+        for (float t=0;t<=splineMono.Curves.Count; t += 0.5f)
+        {
+            Handles.DrawLine(splineMono.GetPositionAtTime(t), splineMono.GetPositionAtTime(t) + (Vector3.up * 2));
+        }
+
     }
 
 }
