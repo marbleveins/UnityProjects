@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(SplineMono))]
@@ -17,63 +16,44 @@ public class Extruder : MonoBehaviour
     public SplineMono spline;
     public float TextureScale = 1;
 
-    private bool toUpdate = true;
-
     private void Reset()
     {   //Reset is called when the user hits the Reset button in the Inspector's context menu or 
         //when adding the component the first time. This function is only called in editor mode. 
         //Reset is most commonly used to give good default values in the inspector.
         
-
-        toUpdate = true;
+        
         OnEnable();
     }
 
     private void Start()
     {
-        shape2d = new Shape2D();
     }
 
     private void OnValidate()
     {
-        toUpdate = true;//esto es lo que genera el mesh por frame, depende de esto
-    }
-
-    private void OnEnable()
-    {
-        spline = GetComponent<SplineMono>();
-        mf = GetComponent<MeshFilter>();
-        if (mf.sharedMesh == null)
-        {
-            mf.sharedMesh = new Mesh();
-        }
-        //spline.NodeCountChanged.AddListener(() => toUpdate = true);
-        //spline.CurveChanged.AddListener(() => toUpdate = true);
     }
 
     private void Update()
     {
-        if (toUpdate)
-        {
-            //Generate();
-            toUpdate = false;
-        }
     }
 
-    public bool Shaped()
+    private void OnEnable()
+    {
+    }
+
+    public bool Initialized()
     {
         return (shape2d != null && shape2d.Vertices != null && shape2d.Vertices.Count > 0);
     }
 
     public void Generate()
     {
+        if (!spline.Initialized()) return;
         List<OrientedPoint> path = spline.GetPath2();
         if (path.Count == 0) return;
-        //Shape shape = Shape.Generate(path, ShapeVertices, TextureScale);
+                
         int[] triangleIndices = GenerateTriangles(path.Count-1, shape2d.Vertices.Count);
         
-
-
 
         int edgeLoops = path.Count;//por legibilidad. borrar una vez que se entienda
         int allVertices = shape2d.Vertices.Count * path.Count;
@@ -102,6 +82,12 @@ public class Extruder : MonoBehaviour
 
     private void SetMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangleIndices)
     {
+        mf = GetComponent<MeshFilter>();
+        if (mf.sharedMesh == null)
+        {
+            mf.sharedMesh = new Mesh();
+        }
+
         mf.sharedMesh.Clear();
         mf.sharedMesh.vertices = vertices;
         mf.sharedMesh.normals = normals;

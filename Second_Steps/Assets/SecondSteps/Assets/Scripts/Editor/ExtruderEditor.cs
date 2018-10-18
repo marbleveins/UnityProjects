@@ -16,41 +16,21 @@ public class ExtruderEditor : Editor
         extruder = (Extruder)target;
     }
 
+    public override void OnInspectorGUI()
+    {
+    }
+
     void OnSceneGUI()
     {
-        if (!extruder.spline.Started()) return;
-        CheckExtruder();
-        //extruder.Generate();//ESTO LO DIBUJA BIEN
-
+        extruder = (Extruder)target;
         Event e = Event.current;
         if (e.type == EventType.MouseDown) {
             Undo.RegisterCompleteObjectUndo(extruder, "change extruded shape");
         }
 
+
         FormShape();
-
-    }
-
-    public override void OnInspectorGUI() {
-        
-    }
-
-    private void CheckExtruder()
-    {
-        if (extruder == null) return;
-
-        if (!extruder.Shaped())
-        {
-            extruder.shape2d = GetDefaultShape();
-        }
-    }
-
-    private Shape2D GetDefaultShape()
-    {
-        return new Shape2D
-        {
-            Vertices = CommonHelperForNow.GetDefaultShapeVertices()
-        };
+        extruder.Generate();
     }
 
     private void DrawQuad(Rect rect, Color color)
@@ -67,8 +47,12 @@ public class ExtruderEditor : Editor
         DrawQuad(new Rect(position - new Vector2(QUAD_SIZE / 2, QUAD_SIZE / 2), new Vector2(QUAD_SIZE, QUAD_SIZE)), color);
     }
 
+    #region FormShape
+
     private void FormShape()
     {
+        if (!extruder.Initialized()) return;
+
         Vector3 startingTangent = extruder.spline.GetOrientationAtTime(0);
         Vector3 startingPosition = extruder.spline.GetPositionAtTime(0);
         Quaternion q = CubicBezierCurve.GetRotationFromTangent(startingTangent);
@@ -92,7 +76,6 @@ public class ExtruderEditor : Editor
             DrawShapeLines(point, normal, startingPosition, q, v);
 
         }
-
     }
 
     private void HandleShapeVertexMovement(Vector3 point, Vector3 normal, Vector3 startingPosition, Vector3 startingTangent, Quaternion q, Vertex v)
@@ -123,7 +106,7 @@ public class ExtruderEditor : Editor
         // normal must be updated if point has been moved
         normal = extruder.transform.TransformPoint(q * (v.point + v.normal) + startingPosition);
 
-        extruder.Generate();
+        //extruder.Generate();
     }
     private void DrawShapeVertexNormalHandle(Vector3 normal, Vector3 startingPosition, Vector3 startingTangent, Vector3 movedNormal, Quaternion q, Vertex v)
     {
@@ -133,7 +116,7 @@ public class ExtruderEditor : Editor
         {
             // normal has been moved
             v.normal = (Vector2)(Quaternion.Inverse(q) * (extruder.transform.InverseTransformPoint(movedNormal) - startingPosition)) - v.point;
-            extruder.Generate();
+            //extruder.Generate();
         }
     }
 
@@ -169,5 +152,6 @@ public class ExtruderEditor : Editor
         DrawQuad(HandleUtility.WorldToGUIPoint(normal), Color.red);
         Handles.EndGUI();
     }
+    #endregion
 
 }

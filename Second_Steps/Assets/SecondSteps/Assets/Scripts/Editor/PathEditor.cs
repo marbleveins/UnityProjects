@@ -3,13 +3,18 @@ using UnityEditor;
 [CustomEditor(typeof(Path))]
 public class PathEditor : Editor
 {
+    private Path path;
+    
 
-
-
-
+    private void Awake()
+    {
+        path = (Path)target;
+        path.Initialize();
+    }
     private void OnEnable()
     {
-        var enabled = true;//?
+        path = (Path)target;
+
     }
     public override void OnInspectorGUI()
     {
@@ -20,4 +25,5 @@ public class PathEditor : Editor
 
     }
 
+    
 }

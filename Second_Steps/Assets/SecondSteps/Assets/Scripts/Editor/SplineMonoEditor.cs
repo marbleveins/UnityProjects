@@ -45,30 +45,18 @@ public class SplineMonoEditor : Editor
 
         splineMono = target as SplineMono;
 
-        if (splineMono.Started())
-        {
-            handleTransform = splineMono.transform;
-            handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
-            DrawHandles();
-            CheckNodeMovement(selectedNode);
-            DrawCurves();
-            //DrawDirections();
-            DrawUpwards();
-        }
-        else
-        {
-            StartNewSpline();
-        }
+        if (!splineMono.Initialized()) return;
 
-    }
+        handleTransform = splineMono.transform;
+        handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
-    private void StartNewSpline()
-    {
-        splineMono.AddFollowingDefaultCurve();
-        splineMono.AddFollowingDefaultCurve();
-        splineMono.AddFollowingDefaultCurve();
-        splineMono.AddFollowingDefaultCurve();
+        DrawHandles();
+        CheckNodeMovement(selectedNode);
+        DrawCurves();
+        //DrawDirections();
+        DrawRotation();
+
     }
 
 
@@ -137,7 +125,7 @@ public class SplineMonoEditor : Editor
 
     private void DrawDirections()
     {
-        if (splineMono.Started())
+        if (splineMono.Initialized())
         {
             Handles.color = Color.green;
 
@@ -158,13 +146,14 @@ public class SplineMonoEditor : Editor
         }
     }
 
-    private void DrawUpwards()
+    private void DrawRotation()
     {
-        if (!splineMono.Started()) return;
+        if (!splineMono.Initialized()) return;
 
         Handles.color = Color.yellow;
-        for (float t=0;t<=splineMono.Curves.Count; t += 0.5f)
+        for (float t = 0; t <= splineMono.Curves.Count; t += 0.5f)
         {
+            var rotation = Curve.GetRotationFromTangent(splineMono.GetOrientationAtTime(t));
             Handles.DrawLine(splineMono.GetPositionAtTime(t), splineMono.GetPositionAtTime(t) + (Vector3.up * 2));
         }
 
