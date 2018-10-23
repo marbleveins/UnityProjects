@@ -55,6 +55,7 @@ public class SplineMonoEditor : Editor
         CheckNodeMovement(selectedNode);
         DrawCurves();
         //DrawDirections();
+        DrawRotationFixed();
         DrawRotation();
 
     }
@@ -147,6 +148,20 @@ public class SplineMonoEditor : Editor
     }
 
     private void DrawRotation()
+    {
+        if (!splineMono.Initialized()) return;
+
+        Handles.color = Color.green;
+        for (float t = 0; t <= splineMono.Curves.Count; t += 0.5f)
+        {
+            var rotation = Curve.GetRotationFromTangent(splineMono.GetOrientationAtTime(t));
+            Handles.DrawLine(splineMono.GetPositionAtTime(t), splineMono.GetPositionAtTime(t) + (rotation * Vector3.up) );
+
+        }
+
+    }
+
+    private void DrawRotationFixed()
     {
         if (!splineMono.Initialized()) return;
 

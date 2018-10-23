@@ -8,12 +8,21 @@ public class Node
     
     public Vector3 position;
     public Vector3 direction;
+    public Quaternion rotation;
     public ControlPointMode mode;
 
     public Node(Vector3 position, Vector3 direction)
     {
         SetPosition(position);
         SetDirection(direction);
+        SetRotation(Quaternion.identity);
+    }
+
+    public Node(Vector3 position, Vector3 direction, Quaternion rotation)
+    {
+        SetPosition(position);
+        SetDirection(direction);
+        SetRotation(rotation);
     }
 
     public void SetPosition(Vector3 p)
@@ -36,6 +45,18 @@ public class Node
         }
     }
 
+    public void SetRotation(Quaternion r)
+    {
+        if (!rotation.Equals(r))
+        {
+            rotation.x = r.x;
+            rotation.y = r.y;
+            rotation.z = r.z;
+            rotation.w = r.w;
+        }
+    }
+
     [HideInInspector]
     public UnityEvent Changed = new UnityEvent();
+    
 }
